@@ -1,27 +1,30 @@
 import { Component, computed, EventEmitter, inject, Input, Output, signal, ViewEncapsulation } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
-import { AuthService } from '../../core/services/services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
 import { LayoutService } from '../../core/services/layout.service';
 import { ThemeService } from '../../core/services/theme.service';
 import { Check, LayoutDashboard, LucideAngularModule, LucideIconData, LucideSquareStack, Settings, User, Wallet } from 'lucide-angular';
 import { CommonModule } from '@angular/common';
+
 export type NavItem = {
   label: string;
   icon: LucideIconData;
   to: string;
   exact?: boolean;
+  roles?: string[]; // Optional: restrict to specific roles
 };
 
 const LS_COLLAPSE_KEY = "uzi_sidebar_collapsed";
+
 @Component({
   selector: 'app-side-bar',
-  imports: [CommonModule,RouterLink,RouterLinkActive,RouterModule,LucideAngularModule],
+  imports: [CommonModule, RouterLink, RouterLinkActive, RouterModule, LucideAngularModule],
   templateUrl: './side-bar.html',
   styleUrl: './side-bar.css',
-   encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.None,
 })
 export class SideBar {
- theme=inject(ThemeService)
+  theme = inject(ThemeService);
   layout = inject(LayoutService);
   private auth = inject(AuthService);
   private router = inject(Router);
@@ -29,19 +32,74 @@ export class SideBar {
   /** mobile drawer open/close */
   @Input() open = false;
   @Output() openChange = new EventEmitter<boolean>();
- // desktop collapsed state persisted
-collapsed = this.layout.collapsed;  
+  
+  // desktop collapsed state persisted
+  collapsed = this.layout.collapsed;
 
   widthClass = computed(() => (this.collapsed() ? "w-20" : "w-72"));
   padLeftClass = computed(() => (this.collapsed() ? "md:pl-20" : "md:pl-72"));
-nav: NavItem[] = [
-  { label: "Dashboard", icon: LayoutDashboard, to: "/dashboard", exact: true },
-  { label: "Batches", icon: LucideSquareStack, to: "/dashboard/batches" },
-  { label: "Wallet Roles", icon: Wallet, to: "/dashboard/wallet-roles" },
-  { label: "Verify Batch", icon: Check, to: "/dashboard/verify-batch" },
-  { label: "Users", icon: User, to: "/dashboard/users" },
-  { label: "Settings", icon: Settings, to: "/settings" },
-];
+
+  // Get current user role
+  currentRole = computed(() => this.auth.currentUser()?.role);
+
+  // Define all possible nav items with role restrictions
+  private allNavItems: NavItem[] = [
+    { 
+      label: "Dashboard", 
+      icon: LayoutDashboard, 
+      to: "/dashboard", 
+      exact: true,
+      roles: ['admin', 'manufacturer', 'distributor', 'pharmacy']
+    },
+    { 
+      label: "Batches", 
+      icon: LucideSquareStack, 
+      to: "/dashboard/batches",
+      roles: ['admin', 'manufacturer']
+    },
+    { 
+      label: "History", 
+      icon: LucideSquareStack, 
+      to: "/dashboard/history",
+      roles: ['manufacturer']
+    },
+    { 
+      label: "Wallet Roles", 
+      icon: Wallet, 
+      to: "/dashboard/wallet-roles",
+      roles: ['admin']
+    },
+    { 
+      label: "Verify Batch", 
+      icon: Check, 
+      to: "/dashboard/verify-batch",
+      roles: ['admin', 'manufacturer', 'distributor', 'pharmacy']
+    },
+    { 
+      label: "Users", 
+      icon: User, 
+      to: "/dashboard/users",
+      roles: ['admin']
+    },
+    { 
+      label: "Settings", 
+      icon: Settings, 
+      to: "/settings",
+      roles: ['admin', 'manufacturer', 'distributor', 'pharmacy']
+    },
+  ];
+
+  // Computed nav items based on user role - returns array, not signal
+  navItems = computed(() => {
+    const role = this.currentRole();
+    if (!role) return [];
+    
+    // Filter nav items that are allowed for this role
+    return this.allNavItems.filter(item => {
+      if (!item.roles) return true;
+      return item.roles.includes(role);
+    });
+  });
 
   close() {
     this.openChange.emit(false);
@@ -61,5 +119,5 @@ nav: NavItem[] = [
     this.router.navigateByUrl("/auth");
   }
 
-    currentYear = new Date().getFullYear();
+  currentYear = new Date().getFullYear();
 }

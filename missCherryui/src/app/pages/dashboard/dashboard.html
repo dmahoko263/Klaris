@@ -1,151 +1,482 @@
-<div class="space-y-6">
+<!-- ═══════════════════════════════════════════════════
+     MANUFACTURER DASHBOARD
+═══════════════════════════════════════════════════ -->
+@if (isManufacturer()) {
+<div class="dashboard-root">
 
-  <!-- Welcome Banner -->
-  <div class="card">
-    <div class="card-body flex items-center justify-between flex-wrap gap-3">
-      <div>
-        <h1 class="text-2xl font-extrabold">Dashboard</h1>
-        <p class="text-muted mt-1">
-          Welcome back,
-          <span class="text-foreground font-semibold">{{ auth.currentUser()?.email }}</span>
-        </p>
-      </div>
-      <span class="badge"
-        [class.badge-crimson]="auth.currentUser()?.role === 'admin'"
-        [class.badge-primary]="auth.currentUser()?.role === 'manufacturer'"
-        [class.badge-emerald]="auth.currentUser()?.role === 'distributor'"
-        [class.badge-gold]="auth.currentUser()?.role === 'pharmacy'"
-        [class.badge-silver]="auth.currentUser()?.role === 'patient'"
-      >
-        {{ auth.currentUser()?.role | titlecase }}
-      </span>
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Batch Dashboard</h2>
+      <p class="page-sub">MissCherryPharmaTrace · Blockchain supply chain overview</p>
     </div>
+    <button class="btn btn-ghost btn-sm" (click)="refresh()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
+        <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/>
+        <path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/>
+      </svg>
+      Refresh
+    </button>
   </div>
 
-  <!-- Stats Row -->
-  <div class="grid gap-4 md:grid-cols-3">
-    <div class="card">
-      <div class="card-body">
-        <div class="text-sm text-muted">System</div>
-        <div class="mt-2 text-xl font-bold">Cherry Pharm Trace</div>
+  <!-- ── Stat Cards ── -->
+  <div class="stat-grid">
+
+    <div class="stat-card stat-blue">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="7" width="20" height="14" rx="2"/>
+          <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+        </svg>
       </div>
-    </div>
-    <div class="card">
-      <div class="card-body">
-        <div class="text-sm text-muted">Chain</div>
-        <div class="mt-2 text-xl font-bold">Hardhat Local</div>
+      <div class="stat-body">
+        <span class="stat-label">Total Batches</span>
+        <span class="stat-value">{{ totalBatches() }}</span>
       </div>
+      <div class="stat-bar stat-bar-blue"></div>
     </div>
-    <div class="card">
-      <div class="card-body flex items-center justify-between">
-        <div>
-          <div class="text-sm text-muted">Status</div>
-          <div class="mt-2 text-xl font-bold">Connected</div>
-        </div>
-        <span class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></span>
+
+    <div class="stat-card stat-green">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
       </div>
+      <div class="stat-body">
+        <span class="stat-label">Delivered</span>
+        <span class="stat-value">{{ deliveredBatches() }}</span>
+      </div>
+      <div class="stat-bar stat-bar-green"></div>
     </div>
+
+    <div class="stat-card stat-yellow">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">In Transit</span>
+        <span class="stat-value">{{ inTransitBatches() }}</span>
+      </div>
+      <div class="stat-bar stat-bar-yellow"></div>
+    </div>
+
+    <div class="stat-card stat-red">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Suspicious</span>
+        <span class="stat-value">{{ suspiciousBatches() }}</span>
+      </div>
+      <div class="stat-bar stat-bar-red"></div>
+    </div>
+
+    <div class="stat-card stat-purple">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Total Verifications</span>
+        <span class="stat-value">{{ totalVerifications() }}</span>
+      </div>
+      <div class="stat-bar stat-bar-purple"></div>
+    </div>
+
+    <div class="stat-card stat-orange">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Recalled</span>
+        <span class="stat-value">{{ recalledBatches() }}</span>
+      </div>
+      <div class="stat-bar stat-bar-orange"></div>
+    </div>
+
   </div>
 
-  <!-- Privileged: Blockchain Overview -->
-  @if (isPrivileged()) {
-    <div class="space-y-4">
-      <div class="flex items-center justify-between">
-        <h2 class="text-lg font-bold">Blockchain Overview</h2>
-        <button class="btn btn-ghost text-sm" (click)="refresh()">↺ Refresh</button>
+  <!-- Loading -->
+  @if (loadingBatches()) {
+    <div class="loading-state">
+      <span class="spinner"></span>
+      <span>Fetching blockchain data…</span>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (batchesError()) {
+    <div class="alert alert-danger">{{ batchesError() }}</div>
+  }
+
+  <!-- ── Batch Block Cards ── -->
+  @if (!loadingBatches() && batches().length > 0) {
+  <section class="section">
+    <h3 class="section-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>
+      </svg>
+      Batch Entries
+      <span class="section-count">{{ totalBatches() }}</span>
+    </h3>
+
+    <div class="batch-grid">
+      @for (batch of batches(); track batch.batchId) {
+      <div class="batch-block"
+           [class.batch-block--suspicious]="batch.suspicious"
+           [class.batch-block--recalled]="batch.status === BatchStatus.Recalled">
+
+        <!-- Header row -->
+        <div class="batch-block-header">
+          <span class="batch-id">#{{ batch.batchId }}</span>
+          <span class="badge" [ngClass]="statusClass(batch)">
+            {{ statusDisplayLabel(batch) }}
+          </span>
+        </div>
+
+        <!-- Fields grid -->
+        <div class="batch-block-body">
+          <div class="batch-field batch-field--wide">
+            <span class="field-label">Drug Name</span>
+            <span class="field-value">{{ batch.drugName }}</span>
+          </div>
+          <div class="batch-field batch-field--wide">
+            <span class="field-label">Manufacturer Name</span>
+            <span class="field-value">{{ batch.manufacturerName }}</span>
+          </div>
+          <div class="batch-field">
+            <span class="field-label">Manufacture Date</span>
+            <span class="field-value">{{ formatDate(batch.manufactureDate) }}</span>
+          </div>
+          <div class="batch-field">
+            <span class="field-label">Expiry Date</span>
+            <span class="field-value" [class.field-value--danger]="isExpired(batch)">
+              {{ formatDate(batch.expiryDate) }}
+              @if (isExpired(batch)) { <span class="expired-tag">Expired</span> }
+            </span>
+          </div>
+          <div class="batch-field">
+            <span class="field-label">Verifications</span>
+            <span class="field-value">{{ batch.verificationCount }}</span>
+          </div>
+          <div class="batch-field">
+            <span class="field-label">Unique Verifiers</span>
+            <span class="field-value">{{ batch.uniqueVerifierCount }}</span>
+          </div>
+        </div>
+
+        <!-- Addresses -->
+        <div class="batch-addresses">
+          <div class="addr-row">
+            <span class="addr-label">Manufacturer</span>
+            <span class="addr-value">{{ shortAddress(batch.manufacturer) }}</span>
+          </div>
+          <div class="addr-row">
+            <span class="addr-label">Current Owner</span>
+            <span class="addr-value">{{ shortAddress(batch.currentOwner) }}</span>
+          </div>
+        </div>
+
+        <!-- Suspicious warning -->
+        @if (batch.suspicious) {
+          <div class="suspicious-flag">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            </svg>
+            Flagged suspicious · {{ batch.verificationCount }} scans / {{ batch.uniqueVerifierCount }} unique verifiers
+          </div>
+        }
+
+        <!-- Hash / metadata footer -->
+        <div class="block-hash">
+          <span class="hash-label">BATCH</span>
+          <span class="hash-value">{{ batch.metadataURI || ('0x' + batch.batchId.toString().padStart(8,'0')) }}</span>
+          <span class="hash-date">{{ formatDate(batch.createdAt) }}</span>
+        </div>
       </div>
+      }
+    </div>
+  </section>
 
-      <!-- Summary Cards -->
-      <div class="grid gap-4 md:grid-cols-3">
-        <div class="card border-l-4 border-l-uzi-500">
-          <div class="card-body">
-            <div class="text-sm text-muted">Total Batches</div>
-            <div class="mt-2 text-3xl font-extrabold text-uzi-500">{{ totalBatches() }}</div>
-          </div>
-        </div>
-        <div class="card border-l-4 border-l-emerald-500">
-          <div class="card-body">
-            <div class="text-sm text-muted">Delivered</div>
-            <div class="mt-2 text-3xl font-extrabold text-emerald-500">{{ deliveredBatches() }}</div>
-          </div>
-        </div>
-        <div class="card border-l-4 border-l-crimson-500">
-          <div class="card-body">
-            <div class="text-sm text-muted">Suspicious</div>
-            <div class="mt-2 text-3xl font-extrabold text-crimson-500">{{ suspiciousBatches() }}</div>
-          </div>
-        </div>
-      </div>
+  <!-- ── Ledger Activity Timeline ── -->
+  <section class="section">
+    <h3 class="section-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+      Detailed Ledger Activity
+      <span class="section-count">{{ totalBatches() }}</span>
+    </h3>
 
-      <!-- Entries + Ledger -->
-      <div class="grid gap-4 md:grid-cols-2">
+    <div class="ledger-list">
+      @for (batch of batches(); track batch.batchId) {
+      <div class="ledger-row">
 
-        <!-- Blockchain Entries -->
-        <div class="card">
-          <div class="card-body space-y-3">
-            <div class="flex items-center justify-between">
-              <h3 class="font-bold">Batch Entries</h3>
-              <span class="badge badge-primary">{{ entries().length }}</span>
+        <!-- Timeline connector -->
+        <div class="ledger-connector">
+          <div class="ledger-dot"
+               [class.ledger-dot--suspicious]="batch.suspicious"
+               [class.ledger-dot--recalled]="batch.status === BatchStatus.Recalled">
+          </div>
+          <div class="ledger-line"></div>
+        </div>
+
+        <!-- Ledger card -->
+        <div class="ledger-card"
+             [class.ledger-card--suspicious]="batch.suspicious"
+             [class.ledger-card--recalled]="batch.status === BatchStatus.Recalled">
+
+          <div class="ledger-card-top">
+            <span class="ledger-batch-id">Batch #{{ batch.batchId }}</span>
+            <span class="badge sm" [ngClass]="statusClass(batch)">{{ statusDisplayLabel(batch) }}</span>
+            <span class="ledger-date">Registered {{ formatDate(batch.createdAt) }}</span>
+          </div>
+
+          <div class="ledger-card-body">
+            <div class="ledger-field">
+              <span class="field-label">Drug</span>
+              <span>{{ batch.drugName }}</span>
             </div>
-
-            @if (loadingEntries()) {
-              <p class="text-sm text-muted animate-pulse">Loading chain data...</p>
-            } @else if (entriesError()) {
-              <p class="text-sm text-uzi-500">{{ entriesError() }}</p>
-            } @else if (entries().length === 0) {
-              <p class="text-sm text-muted">No batches found on chain.</p>
-            } @else {
-              <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
-                @for (entry of entries(); track entry.batchId) {
-                  <div class="rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm">
-                    <div class="flex items-center justify-between">
-                      <span class="font-semibold text-uzi-500">#{{ entry.batchId }} · {{ entry.drugName }}</span>
-                      @if (entry.suspicious) {
-                        <span class="badge badge-crimson text-xs">⚠ Suspicious</span>
-                      } @else {
-                        <span class="badge badge-emerald text-xs">✓ OK</span>
-                      }
-                    </div>
-                    <div class="text-muted mt-1 text-xs truncate">{{ entry.manufacturerName }}</div>
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        </div>
-
-        <!-- Ledger / Transfer History -->
-        <div class="card">
-          <div class="card-body space-y-3">
-            <div class="flex items-center justify-between">
-              <h3 class="font-bold">Ledger</h3>
-              <span class="badge badge-gold">{{ ledger().length }} records</span>
+            <div class="ledger-field">
+              <span class="field-label">Mfr. Name</span>
+              <span>{{ batch.manufacturerName }}</span>
             </div>
-
-            @if (loadingLedger()) {
-              <p class="text-sm text-muted animate-pulse">Loading ledger...</p>
-            } @else if (ledger().length === 0) {
-              <p class="text-sm text-muted">No ledger records found.</p>
-            } @else {
-              <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
-                @for (tx of ledger(); track tx.batchId) {
-                  <div class="rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm">
-                    <div class="flex items-center justify-between">
-                      <span class="font-semibold">Batch #{{ tx.batchId }}</span>
-                      <span class="text-xs text-muted">{{ tx.status | titlecase }}</span>
-                    </div>
-                    <div class="mt-1 text-xs text-muted font-mono truncate">
-                      {{ tx.currentOwner ?? 'N/A' }}
-                    </div>
-                  </div>
-                }
-              </div>
-            }
+            <div class="ledger-field">
+              <span class="field-label">Manufactured</span>
+              <span>{{ formatDate(batch.manufactureDate) }}</span>
+            </div>
+            <div class="ledger-field">
+              <span class="field-label">Expires</span>
+              <span [class.text-danger]="isExpired(batch)">{{ formatDate(batch.expiryDate) }}</span>
+            </div>
+            <div class="ledger-field">
+              <span class="field-label">Mfr. Address</span>
+              <span class="mono">{{ shortAddress(batch.manufacturer) }}</span>
+            </div>
+            <div class="ledger-field">
+              <span class="field-label">Owner</span>
+              <span class="mono">{{ shortAddress(batch.currentOwner) }}</span>
+            </div>
+            <div class="ledger-field">
+              <span class="field-label">Verifications</span>
+              <span>{{ batch.verificationCount }} total · {{ batch.uniqueVerifierCount }} unique</span>
+            </div>
+            <div class="ledger-field">
+              <span class="field-label">Metadata URI</span>
+              <span class="mono truncate-uri">{{ batch.metadataURI || '—' }}</span>
+            </div>
           </div>
-        </div>
 
+          @if (batch.suspicious) {
+            <div class="suspicious-flag">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              </svg>
+              Suspicious — scan thresholds exceeded ({{ batch.verificationCount }} scans / {{ batch.uniqueVerifierCount }} unique verifiers)
+            </div>
+          }
+
+          @if (batch.status === BatchStatus.Recalled) {
+            <div class="recalled-flag">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>
+              </svg>
+              This batch has been recalled
+            </div>
+          }
+
+        </div>
       </div>
+      }
+    </div>
+  </section>
+  }
+
+  <!-- Empty state -->
+  @if (!loadingBatches() && batches().length === 0 && !batchesError()) {
+    <div class="empty-state">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="2" y="7" width="20" height="14" rx="2"/>
+        <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+      </svg>
+      <p>No batches found on the blockchain.</p>
     </div>
   }
 
 </div>
+}
+
+<!-- ═══════════════════════════════════════════════════
+     ADMIN DASHBOARD
+═══════════════════════════════════════════════════ -->
+@if (isAdmin()) {
+<div class="dashboard-root">
+
+  <div class="page-header">
+    <div>
+      <h2 class="page-title">Admin Overview</h2>
+      <p class="page-sub">MissCherryPharmaTrace · Platform & role management</p>
+    </div>
+  </div>
+
+  <!-- Admin stat cards -->
+  <div class="stat-grid">
+
+    <div class="stat-card stat-blue">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Total Users</span>
+        <span class="stat-value">{{ totalUsers() }}</span>
+      </div>
+      <div class="stat-bar stat-bar-blue"></div>
+    </div>
+
+    <div class="stat-card stat-green">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="5" width="20" height="14" rx="2"/>
+          <line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Registered Wallets</span>
+        <span class="stat-value">{{ totalWallets() }}</span>
+      </div>
+      <div class="stat-bar stat-bar-green"></div>
+    </div>
+
+    <div class="stat-card stat-yellow">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">Pending Role Requests</span>
+        <span class="stat-value">{{ pendingRoles() }}</span>
+      </div>
+      <div class="stat-bar stat-bar-yellow"></div>
+    </div>
+
+    <div class="stat-card stat-purple">
+      <div class="stat-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <div class="stat-body">
+        <span class="stat-label">System Status</span>
+        <span class="stat-value stat-value--healthy">Healthy</span>
+      </div>
+      <div class="stat-bar stat-bar-purple"></div>
+    </div>
+
+  </div>
+
+  <!-- Role info cards -->
+  <section class="section">
+    <h3 class="section-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      Contract Roles
+    </h3>
+    <div class="role-grid">
+      <div class="role-card">
+        <span class="role-pill role-pill--admin">DEFAULT_ADMIN</span>
+        <p class="role-desc">Grants / revokes all roles. Can recall batches, flag suspicious, set thresholds, clear flags.</p>
+      </div>
+      <div class="role-card">
+        <span class="role-pill role-pill--manufacturer">MANUFACTURER</span>
+        <p class="role-desc">Registers new batches via <code>registerBatch()</code>. Sets drug name, dates, metadataURI.</p>
+      </div>
+      <div class="role-card">
+        <span class="role-pill role-pill--distributor">DISTRIBUTOR</span>
+        <p class="role-desc">Can mark batches as delivered. Part of the approved supply chain actors registry.</p>
+      </div>
+      <div class="role-card">
+        <span class="role-pill role-pill--pharmacy">PHARMACY</span>
+        <p class="role-desc">Can mark batches as delivered. End of the verified supply chain.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick actions -->
+  <section class="section">
+    <h3 class="section-title">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+      </svg>
+      Quick Actions
+    </h3>
+    <div class="admin-action-grid">
+      <a routerLink="/dashboard/users" class="admin-action-card">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+        </svg>
+        <div class="action-text">
+          <span class="action-title">Manage Users</span>
+          <span class="action-sub">View and control user accounts</span>
+        </div>
+        <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </a>
+      <a routerLink="/dashboard/wallet-roles" class="admin-action-card">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="2" y="5" width="20" height="14" rx="2"/>
+          <line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+        <div class="action-text">
+          <span class="action-title">Wallet Roles</span>
+          <span class="action-sub">Assign MANUFACTURER / DISTRIBUTOR / PHARMACY</span>
+        </div>
+        <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+        </svg>
+      </a>
+    </div>
+  </section>
+
+</div>
+}
+
+<!-- Not privileged -->
+@if (!isPrivileged()) {
+  <div class="dashboard-root">
+    <div class="empty-state">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="11" width="18" height="11" rx="2"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+      </svg>
+      <p>You don't have access to this dashboard.</p>
+    </div>
+  </div>
+}
