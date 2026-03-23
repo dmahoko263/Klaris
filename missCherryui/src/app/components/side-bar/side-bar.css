@@ -1,0 +1,12 @@
+.nav-item span {
+  color: inherit;
+}
+
+.nav-item-active span {
+  color: inherit;
+}
+
+/* Also fix the collapsed state toggle button text */
+a, a * {
+  color: inherit;
+}

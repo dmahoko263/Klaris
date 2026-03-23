@@ -1,0 +1,151 @@
+<div class="space-y-6">
+
+  <!-- Welcome Banner -->
+  <div class="card">
+    <div class="card-body flex items-center justify-between flex-wrap gap-3">
+      <div>
+        <h1 class="text-2xl font-extrabold">Dashboard</h1>
+        <p class="text-muted mt-1">
+          Welcome back,
+          <span class="text-foreground font-semibold">{{ auth.currentUser()?.email }}</span>
+        </p>
+      </div>
+      <span class="badge"
+        [class.badge-crimson]="auth.currentUser()?.role === 'admin'"
+        [class.badge-primary]="auth.currentUser()?.role === 'manufacturer'"
+        [class.badge-emerald]="auth.currentUser()?.role === 'distributor'"
+        [class.badge-gold]="auth.currentUser()?.role === 'pharmacy'"
+        [class.badge-silver]="auth.currentUser()?.role === 'patient'"
+      >
+        {{ auth.currentUser()?.role | titlecase }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Stats Row -->
+  <div class="grid gap-4 md:grid-cols-3">
+    <div class="card">
+      <div class="card-body">
+        <div class="text-sm text-muted">System</div>
+        <div class="mt-2 text-xl font-bold">Cherry Pharm Trace</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div class="text-sm text-muted">Chain</div>
+        <div class="mt-2 text-xl font-bold">Hardhat Local</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-body flex items-center justify-between">
+        <div>
+          <div class="text-sm text-muted">Status</div>
+          <div class="mt-2 text-xl font-bold">Connected</div>
+        </div>
+        <span class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Privileged: Blockchain Overview -->
+  @if (isPrivileged()) {
+    <div class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold">Blockchain Overview</h2>
+        <button class="btn btn-ghost text-sm" (click)="refresh()">↺ Refresh</button>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="grid gap-4 md:grid-cols-3">
+        <div class="card border-l-4 border-l-uzi-500">
+          <div class="card-body">
+            <div class="text-sm text-muted">Total Batches</div>
+            <div class="mt-2 text-3xl font-extrabold text-uzi-500">{{ totalBatches() }}</div>
+          </div>
+        </div>
+        <div class="card border-l-4 border-l-emerald-500">
+          <div class="card-body">
+            <div class="text-sm text-muted">Delivered</div>
+            <div class="mt-2 text-3xl font-extrabold text-emerald-500">{{ deliveredBatches() }}</div>
+          </div>
+        </div>
+        <div class="card border-l-4 border-l-crimson-500">
+          <div class="card-body">
+            <div class="text-sm text-muted">Suspicious</div>
+            <div class="mt-2 text-3xl font-extrabold text-crimson-500">{{ suspiciousBatches() }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Entries + Ledger -->
+      <div class="grid gap-4 md:grid-cols-2">
+
+        <!-- Blockchain Entries -->
+        <div class="card">
+          <div class="card-body space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold">Batch Entries</h3>
+              <span class="badge badge-primary">{{ entries().length }}</span>
+            </div>
+
+            @if (loadingEntries()) {
+              <p class="text-sm text-muted animate-pulse">Loading chain data...</p>
+            } @else if (entriesError()) {
+              <p class="text-sm text-uzi-500">{{ entriesError() }}</p>
+            } @else if (entries().length === 0) {
+              <p class="text-sm text-muted">No batches found on chain.</p>
+            } @else {
+              <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                @for (entry of entries(); track entry.batchId) {
+                  <div class="rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm">
+                    <div class="flex items-center justify-between">
+                      <span class="font-semibold text-uzi-500">#{{ entry.batchId }} · {{ entry.drugName }}</span>
+                      @if (entry.suspicious) {
+                        <span class="badge badge-crimson text-xs">⚠ Suspicious</span>
+                      } @else {
+                        <span class="badge badge-emerald text-xs">✓ OK</span>
+                      }
+                    </div>
+                    <div class="text-muted mt-1 text-xs truncate">{{ entry.manufacturerName }}</div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Ledger / Transfer History -->
+        <div class="card">
+          <div class="card-body space-y-3">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold">Ledger</h3>
+              <span class="badge badge-gold">{{ ledger().length }} records</span>
+            </div>
+
+            @if (loadingLedger()) {
+              <p class="text-sm text-muted animate-pulse">Loading ledger...</p>
+            } @else if (ledger().length === 0) {
+              <p class="text-sm text-muted">No ledger records found.</p>
+            } @else {
+              <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                @for (tx of ledger(); track tx.batchId) {
+                  <div class="rounded-xl border border-border bg-surface-2 px-4 py-3 text-sm">
+                    <div class="flex items-center justify-between">
+                      <span class="font-semibold">Batch #{{ tx.batchId }}</span>
+                      <span class="text-xs text-muted">{{ tx.status | titlecase }}</span>
+                    </div>
+                    <div class="mt-1 text-xs text-muted font-mono truncate">
+                      {{ tx.currentOwner ?? 'N/A' }}
+                    </div>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        </div>
+
+      </div>
+    </div>
+  }
+
+</div>

@@ -1,0 +1,37 @@
+<div class="card max-w-3xl">
+  <div class="card-body">
+    <div class="mb-6">
+      <h1 class="text-2xl font-extrabold">Verify Drug Batch</h1>
+      <p class="text-sm text-muted">Check authenticity by batch ID.</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="verify()" class="flex gap-3">
+      <input class="input" formControlName="batchId" placeholder="Enter batch ID" />
+      <button class="btn btn-accent" [disabled]="loading">
+        {{ loading ? 'Checking...' : 'Verify' }}
+      </button>
+    </form>
+
+    @if (result) {
+      <div class="mt-6 card">
+        <div class="card-body space-y-2">
+          <div class="flex items-center gap-2">
+            <span class="badge" [class.badge-emerald]="result.valid" [class.badge-crimson]="!result.valid">
+              {{ result.reason }}
+            </span>
+          </div>
+
+          <div><strong>Drug:</strong> {{ result.drugName }}</div>
+          <div><strong>Manufacturer:</strong> {{ result.manufacturerName }}</div>
+          <div><strong>Expiry Date:</strong> {{ result.expiryDate }}</div>
+          <div><strong>Current Owner:</strong> {{ result.currentOwner }}</div>
+          <div><strong>Suspicious:</strong> {{ result.suspicious ? 'Yes' : 'No' }}</div>
+        </div>
+      </div>
+    }
+
+    @if (error) {
+      <div class="alert alert-danger mt-6">{{ error }}</div>
+    }
+  </div>
+</div>

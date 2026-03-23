@@ -1,0 +1,86 @@
+<div class="min-h-screen flex items-center justify-center p-6 bg-background">
+
+  <!-- Card -->
+  <div class="card w-full max-w-sm">
+    <div class="card-body space-y-6">
+
+      <!-- Brand -->
+      <div class="flex flex-col items-center gap-2 text-center">
+        @if (theme.isDark()) {
+          <img src="/cherrylogosymbol.png" alt="logo" class="h-14 w-auto" />
+        } @else {
+          <img src="/lod1.png" alt="logo" class="h-14 w-auto" />
+        }
+<h1 class="text-2xl font-extrabold flex items-center gap-2">
+  <lucide-icon [img]="CherryIcon" class="text-uzi-500" [size]="28"></lucide-icon>
+  <span class="text-uzi-500">Cherry</span>
+  <span [class]="theme.isDark() ? 'text-white' : 'text-gray-700'">Pharm</span>
+</h1>
+        <p class="text-xs font-semibold tracking-widest text-muted">
+          SECURE BLOCKCHAIN DRUG TRACKING
+        </p>
+      </div>
+
+      <!-- Divider -->
+      <div class="border-t border-border"></div>
+
+      <!-- Form -->
+      <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
+
+        <div>
+          <label class="label">Email</label>
+          <input
+            class="input"
+            type="email"
+            placeholder="you@example.com"
+            formControlName="email"
+          />
+          @if (form.get('email')?.touched && form.get('email')?.invalid) {
+            <p class="help text-uzi-500">Enter a valid email address.</p>
+          }
+        </div>
+
+        <div>
+          <label class="label">Password</label>
+          <input
+            class="input"
+            type="password"
+            placeholder="••••••••"
+            formControlName="password"
+          />
+          @if (form.get('password')?.touched && form.get('password')?.invalid) {
+            <p class="help text-uzi-500">Password is required.</p>
+          }
+        </div>
+
+        @if (error) {
+          <div class="alert alert-danger text-sm">{{ error }}</div>
+        }
+
+        <button
+          type="submit"
+          class="btn btn-primary w-full mt-2"
+          [disabled]="loading"
+        >
+          @if (loading) {
+            <span class="animate-spin mr-2">⏳</span> Logging in...
+          } @else {
+            Login
+          }
+        </button>
+
+        <p class="text-center text-sm text-muted">
+          No account?
+          <a
+            routerLink="/auth/register"
+            class="font-semibold text-uzi-500 hover:underline"
+          >
+            Register
+          </a>
+        </p>
+
+      </form>
+    </div>
+  </div>
+
+</div>

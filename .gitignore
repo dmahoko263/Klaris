@@ -1,0 +1,44 @@
+# Dependencies
+**/node_modules/
+
+# Build outputs
+**/dist/
+**/build/
+**/tmp/
+**/out-tsc/
+
+# Hardhat specific
+**/artifacts/
+**/cache/
+**/coverage/
+**/coverage.json
+**/typechain/
+**/typechain-types/
+
+# Angular specific
+**/.angular/
+**/.ngcache/
+
+# Environment files
+**/.env
+**/.env.local
+**/.env.*.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+**/logs/
+**/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db

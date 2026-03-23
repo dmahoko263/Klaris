@@ -1,0 +1,18 @@
+/* src/styles/theme.dark.css */
+.dark {
+  --color-background: #0B0B0D;
+  --color-foreground: #F8FAFC;
+
+  --color-surface: #101114;
+  --color-surface-2: #15161A;
+
+  --color-muted: #A1A1AA;
+  --color-border: #26272B;
+
+  /* Keep brand loud in dark */
+  --color-primary: var(--color-uzi-500);
+  --color-on-primary: #FFFFFF;
+
+  --color-accent: var(--color-gold-400);
+  --color-on-accent: #0B0B0D;
+}

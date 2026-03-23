@@ -1,0 +1,1 @@
+export type UserRole = 'Manufacturer' | 'Distributer' | 'Pharmarcy' | 'Patient';

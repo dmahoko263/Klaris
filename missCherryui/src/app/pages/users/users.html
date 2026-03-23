@@ -1,0 +1,133 @@
+<div class="space-y-6">
+
+  <!-- Header -->
+  <div class="card">
+    <div class="card-body flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-extrabold">Users</h1>
+        <p class="text-muted mt-1">Manage user wallet addresses and access</p>
+      </div>
+      <span class="badge badge-primary">{{ users().length }} users</span>
+    </div>
+  </div>
+
+  <!-- Feedback -->
+  @if (success()) {
+    <div class="alert alert-success">✓ {{ success() }}</div>
+  }
+  @if (error()) {
+    <div class="alert alert-danger">✗ {{ error() }}</div>
+  }
+
+  <!-- Edit Wallet Modal -->
+  @if (editingUser()) {
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+      <div class="card w-full max-w-md">
+        <div class="card-body space-y-4">
+          <h2 class="text-lg font-extrabold">Edit Wallet Address</h2>
+          <p class="text-sm text-muted">{{ editingUser().email }}</p>
+
+          <form [formGroup]="walletForm" (ngSubmit)="saveWallet()" class="space-y-4">
+            <div>
+              <label class="label">Wallet Address</label>
+              <input
+                class="input"
+                formControlName="walletAddress"
+                placeholder="0x..."
+              />
+              @if (walletForm.get('walletAddress')?.touched && walletForm.get('walletAddress')?.invalid) {
+                <p class="help text-uzi-500">Enter a valid Ethereum address (0x + 40 hex chars)</p>
+              }
+            </div>
+
+            <div class="flex gap-3">
+              <button type="submit" class="btn btn-primary flex-1" [disabled]="loading()">
+                {{ loading() ? 'Saving...' : 'Save Wallet' }}
+              </button>
+              <button type="button" class="btn btn-ghost flex-1" (click)="cancelEdit()">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Users Table -->
+  <div class="card">
+    <div class="card-body">
+      @if (loading() && users().length === 0) {
+        <p class="text-sm text-muted animate-pulse">Loading users...</p>
+      } @else if (users().length === 0) {
+        <p class="text-sm text-muted">No users found.</p>
+      } @else {
+        <div class="table">
+          <table class="w-full">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Wallet Address</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (user of users(); track user.id) {
+                <tr>
+                  <td class="font-semibold">{{ user.email }}</td>
+                  <td>
+                    <span class="badge"
+                      [class.badge-crimson]="user.role === 'admin'"
+                      [class.badge-primary]="user.role === 'manufacturer'"
+                      [class.badge-emerald]="user.role === 'distributor'"
+                      [class.badge-gold]="user.role === 'pharmacy'"
+                      [class.badge-silver]="user.role === 'patient'"
+                    >
+                      {{ user.role | titlecase }}
+                    </span>
+                  </td>
+                  <td class="font-mono text-xs">
+                    @if (user.walletAddress) {
+                      <span class="text-uzi-500">{{ user.walletAddress }}</span>
+                    } @else {
+                      <span class="text-muted italic">Not set</span>
+                    }
+                  </td>
+                  <td>
+                    <span class="badge"
+                      [class.badge-emerald]="user.isActive"
+                      [class.badge-crimson]="!user.isActive"
+                    >
+                      {{ user.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="flex gap-2">
+                      <button
+                        class="btn btn-ghost text-xs px-2 py-1"
+                        (click)="startEdit(user)"
+                      >
+                        ✏ Wallet
+                      </button>
+                      <button
+                        class="btn text-xs px-2 py-1"
+                        [class.btn-danger]="user.isActive"
+                        [class.btn-ghost]="!user.isActive"
+                        (click)="toggleActive(user)"
+                      >
+                        {{ user.isActive ? 'Disable' : 'Enable' }}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+
+</div>

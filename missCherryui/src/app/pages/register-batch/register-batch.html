@@ -1,0 +1,89 @@
+<div class="card max-w-3xl">
+  <div class="card-body">
+    <div class="mb-6">
+      <h1 class="text-2xl font-extrabold">Register Batch</h1>
+      <p class="text-sm text-muted">Manufacturer registers a new drug batch on-chain.</p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-4 md:grid-cols-2">
+      <div>
+        <label class="label">Batch ID</label>
+        <input class="input" type="number" formControlName="batchId" />
+      </div>
+
+      <div>
+        <label class="label">Drug Name</label>
+        <input class="input" formControlName="drugName" />
+      </div>
+
+      <div>
+        <label class="label">Manufacturer Name</label>
+        <input class="input" formControlName="manufacturerName" />
+      </div>
+
+      <div>
+        <label class="label">Manufacture Date (Unix)</label>
+        <input class="input" type="date" formControlName="manufactureDate" />
+      </div>
+
+      <div>
+        <label class="label">Expiry Date (Unix)</label>
+        <input class="input" type="date" formControlName="expiryDate" />
+      </div>
+
+      <div>
+        <label class="label">Metadata URI</label>
+        <input class="input" formControlName="metadataURI" />
+      </div>
+    <!-- Metadata fields -->
+      <div>
+        <label class="label">Description</label>
+        <input class="input" formControlName="description" />
+      </div>
+
+      <div>
+        <label class="label">Dosage</label>
+        <input class="input" formControlName="dosage" />
+      </div>
+
+      <div>
+        <label class="label">Form</label>
+        <input class="input" formControlName="form" />
+      </div>
+
+      <div>
+        <label class="label">Storage Conditions</label>
+        <input class="input" formControlName="storageConditions" />
+      </div>
+
+      <div>
+        <label class="label">Manufacturer Country</label>
+        <input class="input" formControlName="manufacturerCountry" />
+      </div>
+
+      <div>
+        <label class="label">Regulatory Approval</label>
+        <input class="input" formControlName="regulatoryApproval" />
+      </div>
+
+      <div class="md:col-span-2">
+        <button class="btn btn-primary" [disabled]="loading">
+          {{ loading ? 'Submitting...' : 'Register Batch' }}
+        </button>
+      </div>
+    </form>
+
+    @if (successMessage) {
+      <div class="alert alert-success mt-6">
+        <div class="font-semibold">Batch registered successfully</div>
+        <div class="text-sm mt-1">Tx Hash: {{ result.txHash }}</div>
+      </div>
+    }
+
+    @if (error) {
+      <div class="alert alert-danger mt-6">
+        {{ error }}
+      </div>
+    }
+  </div>
+</div>
