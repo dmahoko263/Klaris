@@ -384,22 +384,22 @@ export class PharmaWeb3Service {
    * Use this only if your contract really allows public verification logging.
    * For public QR verification, prefer backend/API verification instead.
    */
-  async verifyAndLog(batchId: string | number, note?: string) {
-    const contract = await this.getWriteContract();
+ async verifyAndLog(batchId: string | number, note?: string) {
+  const contract = await this.getWriteContract();
 
-    const tx = await contract.verifyAndLog(
-      this.toBigIntSafe(batchId),
-      note || 'Verified from MetaMask'
-    );
+  const tx = await contract['verifyAndLog'](
+    this.toBigIntSafe(batchId),
+    note || 'Verified from MetaMask'
+  );
 
-    const receipt = await tx.wait();
+  const receipt = await tx.wait();
 
-    return {
-      ok: true,
-      txHash: receipt?.hash ?? tx.hash,
-      blockNumber: receipt?.blockNumber ?? null,
-      batchId: String(batchId),
-      from: tx.from,
-    };
-  }
+  return {
+    ok: true,
+    txHash: receipt?.hash ?? tx.hash,
+    blockNumber: receipt?.blockNumber ?? null,
+    batchId: String(batchId),
+    from: tx.from,
+  };
+}
 }
