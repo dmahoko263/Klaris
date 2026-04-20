@@ -1,88 +1,243 @@
-<div class="card max-w-3xl">
-  <div class="card-body">
-    <div class="mb-6">
-      <h1 class="text-2xl font-extrabold">Register Batch</h1>
-      <p class="text-sm text-muted">Manufacturer registers a new drug batch on-chain.</p>
+<div class="card max-w-4xl mx-auto">
+  <div class="card-body p-6 md:p-8">
+    <div class="mb-6 border-b border-border pb-4">
+      <h1 class="text-2xl font-extrabold text-foreground">Register Batch</h1>
+      <p class="mt-1 text-sm text-muted">
+        Manufacturer registers a new drug batch on-chain.
+      </p>
+    </div>
+<!-- 
+    <div class="mb-6 rounded-2xl border border-uzi-200 bg-uzi-50/60 p-4">
+      <div class="text-sm font-semibold text-uzi-700">Manufacturer Profile</div>
+      <div class="mt-1 text-sm text-muted">
+        Company name is auto-filled from the logged-in manufacturer account and cannot be edited here.
+      </div>
     </div>
 
-    <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-4 md:grid-cols-2">
-      <div>
-        <label class="label">Batch ID</label>
-        <input class="input" type="number" formControlName="batchId" />
+    <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
+      <div class="text-sm font-semibold text-emerald-700">Automatic Batch ID Generation</div>
+      <div class="mt-1 text-sm text-muted">
+        Batch ID will be generated automatically as a unique cryptographic hash when the batch is registered.
       </div>
+    </div> -->
 
+    <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-5 md:grid-cols-2">
       <div>
         <label class="label">Drug Name</label>
-        <input class="input" formControlName="drugName" />
+        <input
+          class="input"
+          formControlName="drugName"
+          placeholder="Enter drug name"
+        />
       </div>
 
       <div>
         <label class="label">Manufacturer Name</label>
-        <input class="input" formControlName="manufacturerName" />
-      </div>
-
-      <div>
-        <label class="label">Manufacture Date (Unix)</label>
-        <input class="input" type="date" formControlName="manufactureDate" />
-      </div>
-
-      <div>
-        <label class="label">Expiry Date (Unix)</label>
-        <input class="input" type="date" formControlName="expiryDate" />
-      </div>
-
-      <div>
-        <label class="label">Metadata URI</label>
-        <input class="input" formControlName="metadataURI" />
-      </div>
-    <!-- Metadata fields -->
-      <div>
-        <label class="label">Description</label>
-        <input class="input" formControlName="description" />
-      </div>
-
-      <div>
-        <label class="label">Dosage</label>
-        <input class="input" formControlName="dosage" />
-      </div>
-
-      <div>
-        <label class="label">Form</label>
-        <input class="input" formControlName="form" />
-      </div>
-
-      <div>
-        <label class="label">Storage Conditions</label>
-        <input class="input" formControlName="storageConditions" />
+        <input
+          class="input bg-surface-2 text-muted cursor-not-allowed"
+          formControlName="manufacturerName"
+          readonly
+          placeholder="Auto-filled from account"
+        />
+        <small class="mt-1 block text-xs text-muted">
+          This value comes from your company profile.
+        </small>
       </div>
 
       <div>
         <label class="label">Manufacturer Country</label>
-        <input class="input" formControlName="manufacturerCountry" />
+        <input
+          class="input"
+          formControlName="manufacturerCountry"
+          placeholder="Enter manufacturer country"
+        />
       </div>
 
       <div>
-        <label class="label">Regulatory Approval</label>
-        <input class="input" formControlName="regulatoryApproval" />
+        <label class="label">Manufacture Date</label>
+        <input class="input" type="date" formControlName="manufactureDate" />
+      </div>
+
+      <div>
+        <label class="label">Expiry Date</label>
+        <input class="input" type="date" formControlName="expiryDate" />
       </div>
 
       <div class="md:col-span-2">
-        <button class="btn btn-primary" [disabled]="loading">
-          {{ loading ? 'Submitting...' : 'Register Batch' }}
+        <label class="label">Description</label>
+        <input
+          class="input"
+          formControlName="description"
+          placeholder="Short description of the medicine batch"
+        />
+      </div>
+
+      <div>
+        <label class="label">Dosage</label>
+        <input
+          class="input"
+          formControlName="dosage"
+          placeholder="e.g. 500mg"
+        />
+      </div>
+
+      <div>
+        <label class="label">Form</label>
+        <input
+          class="input"
+          formControlName="form"
+          placeholder="e.g. Tablet, Syrup, Capsule"
+        />
+      </div>
+
+      <div class="md:col-span-2">
+        <label class="label">Storage Conditions</label>
+        <input
+          class="input"
+          formControlName="storageConditions"
+          placeholder="e.g. Store below 25Â°C, keep away from direct sunlight"
+        />
+      </div>
+
+      <div class="md:col-span-2">
+        <label class="label">Regulatory Body</label>
+        <select class="input" formControlName="regulatoryBody">
+          <option value="">Select regulatory body</option>
+          @for (regulator of regulatoryBodies; track regulator.acronym) {
+            <option [value]="regulator.acronym">
+              {{ regulator.acronym }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <div class="md:col-span-2 flex flex-col gap-3 pt-2">
+        <button class="btn btn-primary h-12 text-base font-bold" [disabled]="loading()">
+          {{ loading() ? 'Submitting...' : 'Register Batch' }}
         </button>
       </div>
     </form>
 
-    @if (successMessage) {
-      <div class="alert alert-success mt-6">
-        <div class="font-semibold">Batch registered successfully</div>
-        <div class="text-sm mt-1">Tx Hash: {{ result.txHash }}</div>
+    @if (metadataURI()) {
+      <div class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+        <div class="font-semibold text-emerald-700">Metadata uploaded to IPFS</div>
+        <div class="mt-1 break-all text-sm text-emerald-800">{{ metadataURI() }}</div>
       </div>
     }
 
-    @if (error) {
-      <div class="alert alert-danger mt-6">
-        {{ error }}
+    @if (successMessage()) {
+      <div class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+        <div class="font-semibold text-emerald-700">Batch registered successfully</div>
+
+        @if (generatedBatchLabel()) {
+          <div class="mt-2 text-sm text-emerald-800">
+            <span class="font-semibold">Batch Label:</span>
+            {{ generatedBatchLabel() }}
+          </div>
+        }
+
+        @if (registeredBatchId()) {
+          <div class="mt-1 break-all text-sm text-emerald-800">
+            <span class="font-semibold">Generated Batch ID:</span>
+            {{ registeredBatchId() }}
+          </div>
+        }
+
+        <div class="mt-1 text-sm text-emerald-800">
+          <span class="font-semibold">Tx Hash:</span> {{ result()?.txHash }}
+        </div>
+      </div>
+    }
+
+    @if (error()) {
+      <div class="mt-6 rounded-2xl border border-crimson-200 bg-crimson-50 p-4 text-crimson-700">
+        {{ error() }}
+      </div>
+    }
+
+    @if (hasQr()) {
+      <div class="mt-6 print:hidden">
+        <app-batch-qr [batchId]="registeredBatchId()!"></app-batch-qr>
+      </div>
+    }
+
+    @if (hasLabel()) {
+      <div class="mt-6 rounded-2xl border border-border bg-white p-6 print:border-0 print:shadow-none">
+        <div class="mb-4 flex items-center justify-between gap-4 print:hidden">
+          <div>
+            <h2 class="text-lg font-bold text-foreground">Package Label</h2>
+            <p class="text-sm text-muted">
+              Print this label and place it on the medicine package.
+            </p>
+          </div>
+
+          <button type="button" class="btn btn-primary" (click)="printLabel()">
+            Print Label
+          </button>
+        </div>
+
+        <div class="print-area mx-auto max-w-2xl rounded-2xl border-2 border-dashed border-slate-300 bg-white p-6 text-black">
+          <div class="mb-4 border-b border-slate-300 pb-3 text-center">
+            <div class="text-xl font-extrabold">Pharmaceutical Package Label</div>
+            <div class="text-sm text-slate-600">Blockchain-verified medicine batch</div>
+          </div>
+
+          <div class="grid gap-6 md:grid-cols-[1fr_220px] md:items-start">
+            <div class="space-y-2 text-sm">
+              <div>
+                <span class="font-semibold">Drug Name:</span>
+                {{ registeredBatch()?.drugName || 'â€”' }}
+              </div>
+
+              <div>
+                <span class="font-semibold">Batch Label:</span>
+                {{ registeredBatch()?.batchLabel || generatedBatchLabel() || 'â€”' }}
+              </div>
+
+              <div>
+                <span class="font-semibold">Batch ID:</span>
+                <span class="break-all">{{ registeredBatch()?.batchId || 'â€”' }}</span>
+              </div>
+
+              <div>
+                <span class="font-semibold">Manufacturer:</span>
+                {{ registeredBatch()?.manufacturerName || 'â€”' }}
+              </div>
+
+              <div>
+                <span class="font-semibold">Country:</span>
+                {{ registeredBatch()?.manufacturerCountry || 'â€”' }}
+              </div>
+
+              <div>
+                <span class="font-semibold">Dosage:</span>
+                {{ registeredBatch()?.dosage || 'â€”' }}
+              </div>
+
+              <div>
+                <span class="font-semibold">Form:</span>
+                {{ registeredBatch()?.form || 'â€”' }}
+              </div>
+
+              <div>
+                <span class="font-semibold">Manufacture Date:</span>
+                {{ registeredBatch()?.manufactureDate ? (registeredBatch()?.manufactureDate * 1000 | date:'mediumDate') : 'â€”' }}
+              </div>
+
+              <div>
+                <span class="font-semibold">Expiry Date:</span>
+                {{ registeredBatch()?.expiryDate ? (registeredBatch()?.expiryDate * 1000 | date:'mediumDate') : 'â€”' }}
+              </div>
+            </div>
+
+            <div class="flex flex-col items-center justify-center rounded-xl border border-slate-200 p-4">
+              <app-batch-qr [batchId]="registeredBatchId()!" [compact]="true"></app-batch-qr>
+              <div class="mt-3 text-center text-xs text-slate-600">
+                Scan to verify authenticity
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     }
   </div>

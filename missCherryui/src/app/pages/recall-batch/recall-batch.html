@@ -1,0 +1,77 @@
+<div class="card max-w-3xl mx-auto">
+  <div class="card-body p-6 md:p-8">
+    <div class="mb-6 border-b border-border pb-4">
+      <h1 class="text-2xl font-extrabold text-foreground">Recall Batch</h1>
+      <p class="mt-1 text-sm text-muted">
+        Mark a pharmaceutical batch as recalled and store the reason on-chain.
+      </p>
+    </div>
+
+    <div class="mb-6 rounded-2xl border border-gold-200 bg-gold-50/70 p-4">
+      <div class="text-sm font-semibold text-gold-700">Safety Action</div>
+      <div class="mt-1 text-sm text-muted">
+        This action sends a blockchain transaction from the connected MetaMask wallet.
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-5">
+      <div>
+        <label class="label">Batch ID</label>
+        <input
+          class="input"
+          type="number"
+          formControlName="batchId"
+          placeholder="Enter batch ID"
+        />
+        @if (f.batchId.touched && f.batchId.invalid) {
+          <small class="help text-crimson-600">Batch ID is required.</small>
+        }
+      </div>
+
+      <div>
+        <label class="label">Recall Reason</label>
+        <textarea
+          class="input min-h-[140px] resize-y"
+          formControlName="reason"
+          placeholder="Enter the reason for recalling this batch"
+        ></textarea>
+        @if (f.reason.touched && f.reason.invalid) {
+          <small class="help text-crimson-600">
+            A clear recall reason is required.
+          </small>
+        }
+      </div>
+
+      <div class="pt-2">
+        <button class="btn btn-danger h-12 w-full text-base font-bold" [disabled]="loading()">
+          {{ loading() ? 'Recalling...' : 'Recall Batch' }}
+        </button>
+      </div>
+    </form>
+
+    @if (hasSuccess()) {
+      <div class="alert alert-success mt-6">
+        <div class="font-semibold">Batch recalled successfully</div>
+        <div class="mt-1 text-sm">{{ successMessage() }}</div>
+
+        @if (result()?.txHash) {
+          <div class="mt-2 break-all text-sm">
+            <span class="font-semibold">Tx Hash:</span> {{ result()?.txHash }}
+          </div>
+        }
+
+        @if (result()?.blockNumber) {
+          <div class="mt-1 text-sm">
+            <span class="font-semibold">Block:</span> {{ result()?.blockNumber }}
+          </div>
+        }
+      </div>
+    }
+
+    @if (error()) {
+      <div class="alert alert-danger mt-6">
+        {{ error() }}
+      </div>
+    }
+  </div>
+</div>

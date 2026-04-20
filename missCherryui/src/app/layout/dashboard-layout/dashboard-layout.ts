@@ -25,6 +25,6 @@ sidebarOpen = false;
     constructor() {
     const user = this.profileSvc.currentUser();
     this.role = user?.role;
-    this.address = user?.walletAddress;
+    this.address = user?.walletAddress ?? undefined;
     this.userMail=user?.email;
 }}

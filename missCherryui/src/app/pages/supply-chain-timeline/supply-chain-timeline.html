@@ -1,0 +1,163 @@
+<div class="card max-w-6xl mx-auto">
+  <div class="card-body">
+    <div class="mb-6 border-b border-border pb-4">
+      <h1 class="text-2xl font-extrabold">Supply Chain Timeline</h1>
+      <p class="mt-1 text-sm text-muted">
+        Track batch registration, transfers, verifications, delivery, and recall events.
+      </p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="load()" class="grid gap-4 md:grid-cols-[1fr_auto_auto]">
+      <div>
+        <label class="label">Batch ID</label>
+        <input
+          class="input"
+          type="number"
+          formControlName="batchId"
+          placeholder="Enter batch ID"
+        />
+        @if (f.batchId.touched && f.batchId.invalid) {
+          <small class="help text-crimson-600">Batch ID is required.</small>
+        }
+      </div>
+
+      <div class="self-end">
+        <button class="btn btn-primary h-11 px-5" [disabled]="loading()">
+          {{ loading() ? 'Loading...' : 'Load Timeline' }}
+        </button>
+      </div>
+
+      <div class="self-end">
+        <button
+          type="button"
+          class="btn btn-ghost h-11 px-5"
+          (click)="reset()"
+          [disabled]="loading()"
+        >
+          Reset
+        </button>
+      </div>
+    </form>
+
+    @if (error()) {
+      <div class="alert alert-danger mt-6">
+        {{ error() }}
+      </div>
+    }
+
+    @if (hasBatch()) {
+      <div class="mt-6 grid gap-4 md:grid-cols-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="text-xs font-semibold text-muted">Drug</div>
+            <div class="mt-1 font-bold">{{ batch()?.drugName || '—' }}</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="text-xs font-semibold text-muted">Manufacturer</div>
+            <div class="mt-1 font-bold">{{ batch()?.manufacturerName || '—' }}</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="text-xs font-semibold text-muted">Current Owner</div>
+            <div class="mt-1 font-mono text-sm">{{ shortAddress(batch()?.currentOwner) }}</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <div class="text-xs font-semibold text-muted">Verification Count</div>
+            <div class="mt-1 font-bold">{{ batch()?.verificationCount || 0 }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <div class="mb-4 flex items-center justify-between">
+          <h2 class="text-lg font-bold">Timeline</h2>
+          <span class="badge badge-silver">
+            {{ timeline().length }} events
+          </span>
+        </div>
+
+        <div class="relative pl-6">
+          <div class="absolute left-2 top-0 h-full w-px bg-border"></div>
+
+          <div class="space-y-5">
+            @for (item of timeline(); track $index) {
+              <div class="relative">
+                <div
+                  class="absolute left-[-0.05rem] top-5 h-4 w-4 rounded-full border-4 border-surface"
+                  [class]="itemDotClass(item.type, item.validAtScan)"
+                ></div>
+
+                <div class="card ml-6">
+                  <div class="card-body">
+                    <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                      <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                          <h3 class="font-bold">{{ item.title }}</h3>
+                          <span class="badge" [class]="itemBadgeClass(item.type, item.validAtScan)">
+                            {{ item.badge }}
+                          </span>
+                        </div>
+
+                        @if (item.subtitle) {
+                          <p class="mt-1 text-sm text-muted">{{ item.subtitle }}</p>
+                        }
+                      </div>
+
+                      <div class="text-xs text-muted">
+                        {{ formatDate(item.timestamp) }}
+                      </div>
+                    </div>
+
+                    <div class="mt-4 grid gap-3 md:grid-cols-2">
+                      @if (item.actor) {
+                        <div>
+                          <div class="text-xs font-semibold uppercase tracking-wide text-muted">Actor</div>
+                          <div class="mt-1 font-mono text-sm">{{ shortAddress(item.actor) }}</div>
+                        </div>
+                      }
+
+                      @if (item.from) {
+                        <div>
+                          <div class="text-xs font-semibold uppercase tracking-wide text-muted">From</div>
+                          <div class="mt-1 font-mono text-sm">{{ shortAddress(item.from) }}</div>
+                        </div>
+                      }
+
+                      @if (item.to) {
+                        <div>
+                          <div class="text-xs font-semibold uppercase tracking-wide text-muted">To</div>
+                          <div class="mt-1 font-mono text-sm">{{ shortAddress(item.to) }}</div>
+                        </div>
+                      }
+
+                      @if (item.note) {
+                        <div class="md:col-span-2">
+                          <div class="text-xs font-semibold uppercase tracking-wide text-muted">Note</div>
+                          <div class="mt-1 text-sm">{{ item.note }}</div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+                </div>
+              </div>
+            } @empty {
+              <div class="card ml-6">
+                <div class="card-body text-sm text-muted">
+                  No timeline events found for this batch.
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

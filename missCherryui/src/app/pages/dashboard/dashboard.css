@@ -1,537 +1,65 @@
-/* ── Root ─────────────────────────────────────── */
-.dashboard-root {
-  padding: 1.5rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-/* ── Page Header ──────────────────────────────── */
-.page-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-.page-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-foreground);
-  margin: 0;
-}
-.page-sub {
-  font-size: 0.78rem;
-  color: var(--color-muted);
-  margin: 0.2rem 0 0;
-}
-
-/* btn-sm supplement (project .btn base handles the rest) */
-.btn-sm {
-  padding: 0.35rem 0.85rem;
-  font-size: 0.78rem;
-}
-
-/* ── Stat Grid ────────────────────────────────── */
-.stat-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
-  gap: 1rem;
-}
-
-.stat-card {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  padding: 1rem 1.15rem 1.35rem;
-  border-radius: var(--radius-card);
+.metric-card {
   border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
+  background: white;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.05);
 }
 
-.stat-icon {
-  flex-shrink: 0;
-  width: 42px;
-  height: 42px;
-  border-radius: 0.6rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Icon tints mapped to project palette */
-.stat-blue   .stat-icon { background: color-mix(in srgb, #3b82f6 12%, transparent); color: #3b82f6; }
-.stat-green  .stat-icon { background: color-mix(in srgb, var(--color-emerald-500) 14%, transparent); color: var(--color-emerald-500); }
-.stat-yellow .stat-icon { background: color-mix(in srgb, var(--color-gold-500) 14%, transparent);    color: var(--color-gold-600); }
-.stat-red    .stat-icon { background: color-mix(in srgb, var(--color-crimson-500) 12%, transparent); color: var(--color-crimson-500); }
-.stat-purple .stat-icon { background: color-mix(in srgb, #a855f7 12%, transparent); color: #a855f7; }
-.stat-orange .stat-icon { background: color-mix(in srgb, #f97316 12%, transparent); color: #f97316; }
-
-.stat-body { display: flex; flex-direction: column; gap: 0.1rem; }
-.stat-label {
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: var(--color-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-.stat-value {
-  font-size: 1.65rem;
-  font-weight: 800;
-  color: var(--color-foreground);
-  line-height: 1;
-}
-.stat-value--healthy { font-size: 1rem; color: var(--color-emerald-500); }
-
-/* Bottom accent bar */
-.stat-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; }
-.stat-bar-blue   { background: #3b82f6; }
-.stat-bar-green  { background: var(--color-emerald-500); }
-.stat-bar-yellow { background: var(--color-gold-500); }
-.stat-bar-red    { background: var(--color-crimson-500); }
-.stat-bar-purple { background: #a855f7; }
-.stat-bar-orange { background: #f97316; }
-
-/* ── Section ──────────────────────────────────── */
-.section { display: flex; flex-direction: column; gap: 1rem; }
-
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--color-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-}
-.section-title svg { color: var(--color-primary); flex-shrink: 0; }
-
-.section-count {
-  margin-left: auto;
-  font-size: 0.7rem;
-  font-weight: 700;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  color: var(--color-muted);
-  padding: 0.1rem 0.5rem;
-  border-radius: 999px;
-}
-
-/* ── Batch Block Cards ────────────────────────── */
-.batch-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.15rem;
-}
-
-.batch-block {
-  position: relative;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  padding: 1rem 1.1rem 0.85rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.7rem;
-  box-shadow: var(--shadow-card);
-  transition: box-shadow 0.15s, transform 0.15s;
-}
-.batch-block:hover {
-  box-shadow: var(--shadow-pop);
-  transform: translateY(-2px);
-}
-.batch-block--suspicious {
-  border-color: color-mix(in srgb, var(--color-crimson-500) 40%, transparent);
-  background: color-mix(in srgb, var(--color-crimson-500) 4%, var(--color-surface));
-}
-.batch-block--recalled {
-  border-color: color-mix(in srgb, #f97316 35%, transparent);
-  background: color-mix(in srgb, #f97316 4%, var(--color-surface));
-  opacity: 0.85;
-}
-
-.batch-block-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-.batch-id {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  font-family: ui-monospace, monospace;
-}
-
-/* Fields grid: 2 cols, some spanning full width */
-.batch-block-body {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem 0.85rem;
-}
-.batch-field { display: flex; flex-direction: column; gap: 0.08rem; }
-.batch-field--wide { grid-column: 1 / -1; }
-
-.field-label {
-  font-size: 0.62rem;
-  font-weight: 600;
-  color: var(--color-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-.field-value {
-  font-size: 0.82rem;
-  color: var(--color-foreground);
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  flex-wrap: wrap;
-}
-.field-value--danger { color: var(--color-crimson-500); }
-.text-danger         { color: var(--color-crimson-500); }
-
-.expired-tag {
-  font-size: 0.6rem;
-  font-weight: 700;
-  background: color-mix(in srgb, var(--color-crimson-500) 15%, transparent);
-  color: var(--color-crimson-500);
-  border-radius: 999px;
-  padding: 0.05rem 0.4rem;
-}
-
-/* Address rows */
-.batch-addresses {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  padding: 0.6rem 0.75rem;
-  background: var(--color-surface-2);
-  border-radius: 0.6rem;
-  border: 1px solid var(--color-border);
-}
-.addr-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-.addr-label {
-  font-size: 0.62rem;
-  font-weight: 600;
-  color: var(--color-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  white-space: nowrap;
-}
-.addr-value {
-  font-family: ui-monospace, monospace;
-  font-size: 0.72rem;
-  color: var(--color-foreground);
-  font-weight: 500;
-}
-
-/* Hash / metadata footer */
-.block-hash {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding-top: 0.55rem;
-  border-top: 1px dashed var(--color-border);
-}
-.hash-label {
-  font-size: 0.57rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  color: var(--color-muted);
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  padding: 0.1rem 0.35rem;
-  border-radius: 0.25rem;
-  flex-shrink: 0;
-}
-.hash-value {
-  font-size: 0.67rem;
-  font-family: ui-monospace, monospace;
-  color: var(--color-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-  min-width: 0;
-}
-.hash-date {
-  font-size: 0.65rem;
-  color: var(--color-muted);
-  white-space: nowrap;
-  flex-shrink: 0;
-  margin-left: auto;
-}
-
-/* ── Badges (extends project .badge) ─────────── */
-.badge-registered { background: color-mix(in srgb, #3b82f6 15%, transparent);                  color: #2563eb; }
-.badge-transit    { background: color-mix(in srgb, var(--color-gold-500) 15%, transparent);    color: var(--color-gold-700); }
-.badge-delivered  { background: color-mix(in srgb, var(--color-emerald-500) 15%, transparent); color: var(--color-emerald-600); }
-.badge-recalled   { background: color-mix(in srgb, #f97316 15%, transparent);                  color: #c2410c; }
-.badge-suspicious { background: color-mix(in srgb, var(--color-crimson-500) 15%, transparent); color: var(--color-crimson-600); }
-.badge-expired    { background: color-mix(in srgb, var(--color-crimson-500) 10%, transparent); color: var(--color-crimson-500); }
-.badge-default    { background: var(--color-surface-2); color: var(--color-muted); border: 1px solid var(--color-border); }
-
-/* Dark mode readable badge text */
-.dark .badge-registered { color: #93c5fd; }
-.dark .badge-transit    { color: var(--color-gold-300); }
-.dark .badge-delivered  { color: var(--color-emerald-300); }
-.dark .badge-recalled   { color: #fdba74; }
-.dark .badge-suspicious { color: var(--color-crimson-300); }
-.dark .badge-expired    { color: var(--color-crimson-300); }
-
-.badge.sm { font-size: 0.6rem; padding: 0.15rem 0.5rem; }
-
-/* ── Alert flags ──────────────────────────────── */
-.suspicious-flag,
-.recalled-flag {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.7rem;
-  font-weight: 600;
-  border-radius: 0.5rem;
-  padding: 0.3rem 0.65rem;
-}
-.suspicious-flag {
-  color: var(--color-crimson-500);
-  background: color-mix(in srgb, var(--color-crimson-500) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--color-crimson-500) 25%, transparent);
-}
-.recalled-flag {
-  color: #c2410c;
-  background: color-mix(in srgb, #f97316 8%, transparent);
-  border: 1px solid color-mix(in srgb, #f97316 25%, transparent);
-}
-
-/* ── Ledger Timeline ──────────────────────────── */
-.ledger-list { display: flex; flex-direction: column; }
-
-.ledger-row {
-  display: flex;
-  gap: 0.75rem;
-  align-items: flex-start;
-}
-.ledger-connector {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding-top: 0.9rem;
-  width: 18px;
-  flex-shrink: 0;
-}
-.ledger-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--color-primary);
-  flex-shrink: 0;
-}
-.ledger-dot--suspicious { background: var(--color-crimson-500); }
-.ledger-dot--recalled   { background: #f97316; }
-
-.ledger-line {
-  width: 2px;
-  flex: 1;
-  min-height: 24px;
-  background: var(--color-border);
-  margin-top: 3px;
-}
-.ledger-row:last-child .ledger-line { display: none; }
-
-.ledger-card {
-  flex: 1;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  padding: 0.85rem 1rem;
-  margin-bottom: 0.85rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  box-shadow: var(--shadow-card);
-}
-.ledger-card--suspicious {
-  border-color: color-mix(in srgb, var(--color-crimson-500) 35%, transparent);
-  background: color-mix(in srgb, var(--color-crimson-500) 3%, var(--color-surface));
-}
-.ledger-card--recalled {
-  border-color: color-mix(in srgb, #f97316 30%, transparent);
-  background: color-mix(in srgb, #f97316 3%, var(--color-surface));
-  opacity: 0.85;
-}
-
-.ledger-card-top {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-.ledger-batch-id {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  font-family: ui-monospace, monospace;
-  flex: 1;
-}
-.ledger-date {
-  font-size: 0.68rem;
-  color: var(--color-muted);
-  margin-left: auto;
-  white-space: nowrap;
-}
-
-.ledger-card-body {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 0.45rem 1rem;
-}
-.ledger-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.05rem;
-  font-size: 0.8rem;
-  color: var(--color-foreground);
-}
-
-.mono { font-family: ui-monospace, monospace; font-size: 0.72rem; }
-.truncate-uri {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 180px;
-  display: block;
-}
-
-/* ── Admin Role Cards ─────────────────────────── */
-.role-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1rem;
-}
-.role-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  padding: 1rem 1.1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  box-shadow: var(--shadow-card);
-}
-.role-desc {
-  font-size: 0.78rem;
-  color: var(--color-muted);
-  line-height: 1.5;
-  margin: 0;
-}
-.role-desc code {
-  font-family: ui-monospace, monospace;
-  font-size: 0.72rem;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  border-radius: 0.25rem;
-  padding: 0.05rem 0.3rem;
-  color: var(--color-foreground);
-}
-
-/* Role pill badges */
-.role-pill {
-  display: inline-block;
-  font-size: 0.65rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  padding: 0.2rem 0.65rem;
-  border-radius: 999px;
-}
-.role-pill--admin        { background: color-mix(in srgb, var(--color-primary) 15%, transparent); color: var(--color-primary); }
-.role-pill--manufacturer { background: color-mix(in srgb, #3b82f6 15%, transparent); color: #2563eb; }
-.role-pill--distributor  { background: color-mix(in srgb, var(--color-gold-500) 15%, transparent); color: var(--color-gold-700); }
-.role-pill--pharmacy     { background: color-mix(in srgb, var(--color-emerald-500) 15%, transparent); color: var(--color-emerald-600); }
-
-.dark .role-pill--manufacturer { color: #93c5fd; }
-.dark .role-pill--distributor  { color: var(--color-gold-300); }
-.dark .role-pill--pharmacy     { color: var(--color-emerald-300); }
-
-/* ── Admin Action Cards ───────────────────────── */
-.admin-action-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
-}
-.admin-action-card {
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  padding: 1rem 1.25rem;
-  border-radius: var(--radius-card);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-foreground);
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: var(--shadow-card);
-  transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
-  cursor: pointer;
-}
-.admin-action-card:hover {
-  background: var(--color-surface-2);
-  border-color: var(--color-primary);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-pop);
-}
-.admin-action-card > svg  { color: var(--color-primary); flex-shrink: 0; }
-.admin-action-card .arrow { margin-left: auto; color: var(--color-muted); flex-shrink: 0; }
-
-.action-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  flex: 1;
-}
-.action-title { font-size: 0.88rem; font-weight: 700; }
-.action-sub   { font-size: 0.72rem; color: var(--color-muted); font-weight: 400; }
-
-/* ── Loading / Error / Empty ──────────────────── */
-.loading-state {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: var(--color-muted);
+.metric-label {
   font-size: 0.85rem;
-  padding: 1rem 0;
-}
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 2.5px solid var(--color-border);
-  border-top-color: var(--color-primary);
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-  display: inline-block;
-  flex-shrink: 0;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 4rem 1rem;
   color: var(--color-muted);
-  font-size: 0.88rem;
-  text-align: center;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.metric-value {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--color-foreground);
+  line-height: 1.1;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.badge-default {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.badge-registered {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.badge-transit {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.badge-delivered {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.badge-recalled {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.badge-suspicious {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+.badge-expired {
+  background: #ede9fe;
+  color: #6d28d9;
 }

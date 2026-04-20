@@ -1,9 +1,21 @@
-import { Component, computed, EventEmitter, inject, Input, Output, signal, ViewEncapsulation } from '@angular/core';
+import { Component, computed, EventEmitter, inject, Input, Output, ViewEncapsulation } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { LayoutService } from '../../core/services/layout.service';
 import { ThemeService } from '../../core/services/theme.service';
-import { Check, LayoutDashboard, LucideAngularModule, LucideIconData, LucideSquareStack, Settings, User, Wallet } from 'lucide-angular';
+import {
+  Check,
+  LayoutDashboard,
+  LucideAngularModule,
+  LucideIconData,
+  LucideSquareStack,
+  Settings,
+  User,
+  Wallet,
+  Network,ScanBarcode,Send,LucideLocate,
+  LocateIcon,AlignHorizontalDistributeEndIcon,History,CircleArrowOutUpLeftIcon,
+  Clock
+} from 'lucide-angular';
 import { CommonModule } from '@angular/common';
 
 export type NavItem = {
@@ -11,10 +23,8 @@ export type NavItem = {
   icon: LucideIconData;
   to: string;
   exact?: boolean;
-  roles?: string[]; // Optional: restrict to specific roles
+  roles?: string[];
 };
-
-const LS_COLLAPSE_KEY = "uzi_sidebar_collapsed";
 
 @Component({
   selector: 'app-side-bar',
@@ -29,73 +39,127 @@ export class SideBar {
   private auth = inject(AuthService);
   private router = inject(Router);
 
-  /** mobile drawer open/close */
   @Input() open = false;
   @Output() openChange = new EventEmitter<boolean>();
-  
-  // desktop collapsed state persisted
+
   collapsed = this.layout.collapsed;
 
-  widthClass = computed(() => (this.collapsed() ? "w-20" : "w-72"));
-  padLeftClass = computed(() => (this.collapsed() ? "md:pl-20" : "md:pl-72"));
+  widthClass = computed(() => (this.collapsed() ? 'w-20' : 'w-72'));
+  padLeftClass = computed(() => (this.collapsed() ? 'md:pl-20' : 'md:pl-72'));
 
-  // Get current user role
   currentRole = computed(() => this.auth.currentUser()?.role);
 
-  // Define all possible nav items with role restrictions
   private allNavItems: NavItem[] = [
-    { 
-      label: "Dashboard", 
-      icon: LayoutDashboard, 
-      to: "/dashboard", 
+    {
+      label: 'Dashboard',
+      icon: LayoutDashboard,
+      to: '/dashboard',
       exact: true,
-      roles: ['admin', 'manufacturer', 'distributor', 'pharmacy']
+      roles: ['admin', 'manufacturer', 'distributor', 'pharmacy'],
     },
-    { 
-      label: "Batches", 
-      icon: LucideSquareStack, 
-      to: "/dashboard/batches",
-      roles: ['admin', 'manufacturer']
+    {
+      label:'Network Activity',
+      icon:Network,
+      to:'/dashboard/network-activity',
+      roles:['admin'],
+    }
+    ,
+    {
+      label: 'Batches',
+      icon: LucideSquareStack,
+      to: '/dashboard/batches',
+      roles: ['manufacturer'],
     },
-    { 
-      label: "History", 
-      icon: LucideSquareStack, 
-      to: "/dashboard/history",
-      roles: ['manufacturer']
+    // {
+    //   label: 'History',
+    //   icon: History,
+    //   to: '/dashboard/history',
+    //   roles: ['manufacturer'],
+    // },
+    // {
+    //   label: 'Wallet Roles',
+    //   icon: Wallet,
+    //   to: '/dashboard/wallet-roles',
+    //   roles: ['admin'],
+    // },
+    {
+      label: 'Verify Batch',
+      icon: Check,
+      to: '/dashboard/verify-batch',
+      roles: ['patient', 'distributor', 'pharmacy', 'manufacturer'], // changed here
+    },{
+  label: 'Scan QR',
+  icon: ScanBarcode,
+  to: '/dashboard/scan-batch',
+  roles: ['patient'], // added this new item
+},
+{
+  label: 'Mark Delivered',
+  icon: LocateIcon,
+  to: '/dashboard/mark-delivered',
+  roles: [ 'distributor', 'pharmacy'], // added this new item
+},{
+      label: 'Ownership History',
+      icon: AlignHorizontalDistributeEndIcon,
+      to: '/dashboard/ownership-history',
+      roles: ['patient', 'distributor', 'pharmacy', 'manufacturer', 'admin'], // added this new item
+},
+    {
+      label: 'Transfer Batch',
+      icon: Send,
+      to: '/dashboard/transfer-batch',
+      roles: ['patient', 'distributor', 'pharmacy', 'manufacturer', 'admin'], // added this new item
     },
-    { 
-      label: "Wallet Roles", 
-      icon: Wallet, 
-      to: "/dashboard/wallet-roles",
-      roles: ['admin']
+    {
+      label: 'Recall Batch',
+      icon: CircleArrowOutUpLeftIcon, // Replace with actual icon
+      to: '/dashboard/recall-batch',
+      roles: ['admin','manufacturer'], // added this new item
     },
-    { 
-      label: "Verify Batch", 
-      icon: Check, 
-      to: "/dashboard/verify-batch",
-      roles: ['admin', 'manufacturer', 'distributor', 'pharmacy']
+    {
+      label: 'Verification History',
+      icon: History,
+      to: '/dashboard/verification-history',
+      roles: ['admin', ],
     },
-    { 
-      label: "Users", 
-      icon: User, 
-      to: "/dashboard/users",
-      roles: ['admin']
+    {
+      label: 'Grant Role',
+      icon: User,
+      to: '/dashboard/grant-role',
+      roles: ['admin'], // added this new item
     },
-    { 
-      label: "Settings", 
-      icon: Settings, 
-      to: "/settings",
-      roles: ['admin', 'manufacturer', 'distributor', 'pharmacy']
+    {
+      label: 'Admin Analytics',
+      icon: LayoutDashboard,
+      to: '/dashboard/admin-analytics',
+      roles: ['admin'],
     },
+    {
+      label: 'Supply Chain Timeline',
+      icon: Clock,
+      to: '/dashboard/supply-chain-timeline',
+      roles: ['admin'],
+    },
+    {
+      label: 'Users',
+      icon: User,
+      to: '/dashboard/users',
+      roles: ['admin'],
+    },
+    {
+      label: 'Settings',
+      icon: Settings,
+      to: '/settings',
+      roles: ['admin'],
+    },
+
   ];
 
-  // Computed nav items based on user role - returns array, not signal
   navItems = computed(() => {
     const role = this.currentRole();
     if (!role) return [];
-    
-    // Filter nav items that are allowed for this role
-    return this.allNavItems.filter(item => {
+
+    return this.allNavItems.filter((item) => {
       if (!item.roles) return true;
       return item.roles.includes(role);
     });
@@ -116,7 +180,7 @@ export class SideBar {
   logout() {
     this.auth.logout();
     this.closeMobile();
-    this.router.navigateByUrl("/auth");
+    this.router.navigateByUrl('/auth');
   }
 
   currentYear = new Date().getFullYear();

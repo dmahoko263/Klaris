@@ -1,0 +1,37 @@
+@if (!compact) {
+  <div class="card max-w-md mx-auto">
+    <div class="card-body p-6 text-center">
+      <h2 class="text-xl font-bold mb-2">Batch QR Code</h2>
+      <p class="text-sm text-muted mb-4">
+        Scan to verify this medicine batch
+      </p>
+
+      @if (batchId) {
+        <div class="flex justify-center mb-4">
+          <qrcode
+            [qrdata]="qrValue"
+            [width]="220"
+            [errorCorrectionLevel]="'M'">
+          </qrcode>
+        </div>
+
+        <div class="text-sm">
+          <div><strong>Batch ID:</strong> {{ batchId }}</div>
+          <div class="mt-2 break-all text-muted">{{ qrValue }}</div>
+        </div>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="flex flex-col items-center justify-center">
+    <qrcode
+      [qrdata]="qrValue"
+      [width]="140"
+      [errorCorrectionLevel]="'M'">
+    </qrcode>
+
+    <div class="mt-2 text-center text-xs text-slate-600">
+      Batch ID: {{ batchId }}
+    </div>
+  </div>
+}

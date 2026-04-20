@@ -1,0 +1,42 @@
+:host {
+  display: block;
+}
+
+.card {
+  border-radius: 1rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.btn {
+  border-radius: 0.85rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--color-uzi-500), var(--color-uzi-700));
+  color: white;
+  font-weight: 800;
+}
+
+.metric-card {
+  border: 1px solid var(--color-border);
+  background: white;
+  border-radius: 1rem;
+  padding: 1rem;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.05);
+}
+
+.metric-label {
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.metric-value {
+  font-size: 1.9rem;
+  font-weight: 800;
+  color: var(--color-foreground);
+  line-height: 1.1;
+}

@@ -1,0 +1,39 @@
+<div class="scanner-container">
+
+  <!-- CAMERA -->
+  @if (!scanned()) {
+    <zxing-scanner
+      [formats]="formats"
+      [device]="currentDevice()"
+      (scanSuccess)="onScanSuccess($event)"
+      (scanError)="onScanError($event)"
+      (camerasFound)="onCamerasFound($event)"
+      (torchCompatible)="onTorchCompatible($event)"
+      (permissionResponse)="onPermissionResponse($event)"
+    ></zxing-scanner>
+
+    <!-- SCAN FRAME -->
+    <div class="scan-overlay">
+      <div class="scan-box">
+        <div class="scan-line"></div>
+      </div>
+    </div>
+  }
+
+  <!-- LOADING -->
+  @if (loading()) {
+    <div class="overlay loading">
+      <div class="spinner"></div>
+      <p>Verifying batch...</p>
+    </div>
+  }
+
+  <!-- ERROR -->
+  @if (error()) {
+    <div class="overlay error">
+      <p>{{ error() }}</p>
+      <button class="btn" (click)="retry()">Try Again</button>
+    </div>
+  }
+
+</div>

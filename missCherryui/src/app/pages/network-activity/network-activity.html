@@ -1,0 +1,87 @@
+<div class="card max-w-6xl mx-auto">
+  <div class="card-body p-6 md:p-8">
+    <div class="mb-6 flex items-center justify-between gap-4 border-b border-border pb-4">
+      <div>
+        <h1 class="text-2xl font-extrabold text-foreground">Network Activity</h1>
+        <p class="mt-1 text-sm text-muted">
+          Local blockchain node activity, contract calls, successful transactions, and reverts.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="rounded-full bg-surface-2 px-3 py-1 text-xs font-semibold text-muted">
+          Total: {{ totalEntries() }}
+        </div>
+
+        <button class="btn btn-primary h-11 px-5" (click)="load()" [disabled]="loading()">
+          {{ loading() ? 'Refreshing...' : 'Refresh' }}
+        </button>
+      </div>
+    </div>
+
+    @if (error()) {
+      <div class="mb-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">
+        {{ error() }}
+      </div>
+    }
+
+    <div class="overflow-x-auto rounded-2xl border border-border">
+      <table class="min-w-full text-sm">
+        <thead class="bg-surface-2 text-left">
+          <tr>
+            <th class="px-4 py-3 font-semibold">Type</th>
+            <th class="px-4 py-3 font-semibold">Function</th>
+            <th class="px-4 py-3 font-semibold">Tx Hash</th>
+            <th class="px-4 py-3 font-semibold">Block</th>
+            <th class="px-4 py-3 font-semibold">From</th>
+            <th class="px-4 py-3 font-semibold">Status</th>
+            <th class="px-4 py-3 font-semibold">Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (entry of entries(); track entry.id) {
+            <tr class="border-t border-border">
+              <td class="px-4 py-3">
+                <span class="rounded-full px-3 py-1 text-xs font-semibold" [class]="typeClass(entry.type)">
+                  {{ entry.type }}
+                </span>
+              </td>
+
+              <td class="px-4 py-3">
+                {{ entry.functionName || entry.method || '—' }}
+              </td>
+
+              <td class="px-4 py-3 font-mono">
+                {{ shortHash(entry.txHash) }}
+              </td>
+
+              <td class="px-4 py-3">
+                {{ entry.blockNumber || '—' }}
+              </td>
+
+              <td class="px-4 py-3 font-mono">
+                {{ shortHash(entry.fromAddress) }}
+              </td>
+
+              <td class="px-4 py-3">
+                <span class="rounded-full px-3 py-1 text-xs font-semibold" [class]="statusClass(entry.status)">
+                  {{ entry.status || '—' }}
+                </span>
+              </td>
+
+              <td class="px-4 py-3 max-w-xs truncate">
+                {{ entry.reason || '—' }}
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="px-4 py-8 text-center text-muted">
+                No network activity recorded yet.
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

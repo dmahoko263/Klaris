@@ -1,0 +1,63 @@
+<div class="card max-w-3xl mx-auto">
+  <div class="card-body p-6 md:p-8">
+    <div class="mb-6 border-b border-border pb-4">
+      <h1 class="text-2xl font-extrabold text-foreground">Mark Batch Delivered</h1>
+      <p class="mt-1 text-sm text-muted">
+        Confirm on-chain that a transferred pharmaceutical batch has reached its destination.
+      </p>
+    </div>
+
+    <div class="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4">
+      <div class="text-sm font-semibold text-emerald-700">Delivery Confirmation</div>
+      <div class="mt-1 text-sm text-muted">
+        This action sends a blockchain transaction from the connected MetaMask wallet.
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-5">
+      <div>
+        <label class="label">Batch ID</label>
+        <input
+          class="input"
+          type="number"
+          formControlName="batchId"
+          placeholder="Enter batch ID"
+        />
+        @if (f.batchId.touched && f.batchId.invalid) {
+          <small class="help text-crimson-600">Batch ID is required.</small>
+        }
+      </div>
+
+      <div class="pt-2">
+        <button class="btn btn-primary h-12 w-full text-base font-bold" [disabled]="loading()">
+          {{ loading() ? 'Confirming...' : 'Mark Delivered' }}
+        </button>
+      </div>
+    </form>
+
+    @if (hasSuccess()) {
+      <div class="alert alert-success mt-6">
+        <div class="font-semibold">Batch marked as delivered</div>
+        <div class="mt-1 text-sm">{{ successMessage() }}</div>
+
+        @if (result()?.txHash) {
+          <div class="mt-2 break-all text-sm">
+            <span class="font-semibold">Tx Hash:</span> {{ result()?.txHash }}
+          </div>
+        }
+
+        @if (result()?.blockNumber) {
+          <div class="mt-1 text-sm">
+            <span class="font-semibold">Block:</span> {{ result()?.blockNumber }}
+          </div>
+        }
+      </div>
+    }
+
+    @if (error()) {
+      <div class="alert alert-danger mt-6">
+        {{ error() }}
+      </div>
+    }
+  </div>
+</div>

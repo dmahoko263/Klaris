@@ -1,37 +1,190 @@
-<div class="card max-w-3xl">
-  <div class="card-body">
-    <div class="mb-6">
-      <h1 class="text-2xl font-extrabold">Verify Drug Batch</h1>
-      <p class="text-sm text-muted">Check authenticity by batch ID.</p>
+<div class="card max-w-3xl mx-auto">
+  <div class="card-body p-6 md:p-8">
+    <div class="mb-6 border-b border-border pb-4">
+      <h1 class="text-2xl font-extrabold text-foreground">Verify Batch</h1>
+      <p class="mt-1 text-sm text-muted">
+        Verify authenticity and automatically log the verification on-chain using MetaMask.
+      </p>
     </div>
 
-    <form [formGroup]="form" (ngSubmit)="verify()" class="flex gap-3">
-      <input class="input" formControlName="batchId" placeholder="Enter batch ID" />
-      <button class="btn btn-accent" [disabled]="loading">
-        {{ loading ? 'Checking...' : 'Verify' }}
-      </button>
-    </form>
-
-    @if (result) {
-      <div class="mt-6 card">
-        <div class="card-body space-y-2">
-          <div class="flex items-center gap-2">
-            <span class="badge" [class.badge-emerald]="result.valid" [class.badge-crimson]="!result.valid">
-              {{ result.reason }}
-            </span>
-          </div>
-
-          <div><strong>Drug:</strong> {{ result.drugName }}</div>
-          <div><strong>Manufacturer:</strong> {{ result.manufacturerName }}</div>
-          <div><strong>Expiry Date:</strong> {{ result.expiryDate }}</div>
-          <div><strong>Current Owner:</strong> {{ result.currentOwner }}</div>
-          <div><strong>Suspicious:</strong> {{ result.suspicious ? 'Yes' : 'No' }}</div>
-        </div>
+    @if (autoTriggered()) {
+      <div class="alert mb-4">
+        QR verification detected. The batch will be verified and logged automatically.
       </div>
     }
 
-    @if (error) {
-      <div class="alert alert-danger mt-6">{{ error }}</div>
+    <form [formGroup]="form" class="grid gap-4 md:grid-cols-2">
+      <div>
+        <label class="label">Batch ID</label>
+        <input
+          class="input"
+          type="text"
+          formControlName="batchId"
+          placeholder="Enter batch ID"
+        />
+        @if (f.batchId.touched && f.batchId.invalid) {
+          <small class="help text-crimson-600">
+            Batch ID is required.
+          </small>
+        }
+      </div>
+
+      <div>
+        <label class="label">Verification Note</label>
+        <input
+          class="input"
+          type="text"
+          formControlName="note"
+          placeholder="Optional verification note"
+        />
+      </div>
+
+      <div class="md:col-span-2 flex flex-wrap gap-3">
+        <button
+          type="button"
+          class="btn btn-primary h-11 px-5"
+          [disabled]="loading()"
+          (click)="verify()"
+        >
+          {{ loading() ? 'Verifying...' : 'Verify & Log with MetaMask' }}
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-ghost h-11 px-5"
+          [disabled]="loading()"
+          (click)="reset()"
+        >
+          Reset
+        </button>
+      </div>
+    </form>
+
+    @if (error()) {
+      <div class="alert alert-danger mt-6">
+        {{ error() }}
+      </div>
+    }
+
+    @if (result()) {
+      <div class="mt-6 rounded-2xl border p-5"
+           [class.border-emerald-200]="isVerified()"
+           [class.bg-emerald-50]="isVerified()"
+           [class.border-crimson-200]="!isVerified()"
+           [class.bg-crimson-50]="!isVerified()">
+        <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div>
+            <div class="text-lg font-bold"
+                 [class.text-emerald-700]="isVerified()"
+                 [class.text-crimson-700]="!isVerified()">
+              {{ isVerified() ? 'Batch Verified' : 'Batch Not Valid' }}
+            </div>
+
+            <div class="text-sm"
+                 [class.text-emerald-800]="isVerified()"
+                 [class.text-crimson-800]="!isVerified()">
+              {{ verifyReason() || 'No verification reason returned' }}
+            </div>
+          </div>
+
+          <div class="badge"
+               [class.badge-emerald]="isVerified()"
+               [class.badge-crimson]="!isVerified()">
+            {{ isVerified() ? 'Authentic' : 'Invalid' }}
+          </div>
+        </div>
+
+        <div class="mt-5 grid gap-4 md:grid-cols-2">
+          <div>
+            <div class="text-xs font-semibold uppercase tracking-wide text-muted">Batch ID</div>
+            <div class="mt-1 font-medium">{{ form.getRawValue().batchId }}</div>
+          </div>
+
+          <div>
+            <div class="text-xs font-semibold uppercase tracking-wide text-muted">Drug Name</div>
+            <div class="mt-1 font-medium">{{ result()?.drugName || '—' }}</div>
+          </div>
+
+          <div>
+            <div class="text-xs font-semibold uppercase tracking-wide text-muted">Manufacturer Name</div>
+            <div class="mt-1 font-medium">{{ result()?.manufacturerName || '—' }}</div>
+          </div>
+
+          <div>
+            <div class="text-xs font-semibold uppercase tracking-wide text-muted">Manufacturer Wallet</div>
+            <div class="mt-1 flex items-center gap-2 font-medium">
+              <span>{{ shortAddress(result()?.manufacturer) }}</span>
+              <button
+                type="button"
+                class="btn btn-ghost px-2 py-1 text-xs"
+                (click)="copyText(result()?.manufacturer)"
+              >
+                Copy
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-xs font-semibold uppercase tracking-wide text-muted">Current Owner</div>
+            <div class="mt-1 flex items-center gap-2 font-medium">
+              <span>{{ shortAddress(result()?.currentOwner) }}</span>
+              <button
+                type="button"
+                class="btn btn-ghost px-2 py-1 text-xs"
+                (click)="copyText(result()?.currentOwner)"
+              >
+                Copy
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div class="text-xs font-semibold uppercase tracking-wide text-muted">Status</div>
+            <div class="mt-1 font-medium">{{ statusText() }}</div>
+          </div>
+
+          <div>
+            <div class="text-xs font-semibold uppercase tracking-wide text-muted">Manufacture Date</div>
+            <div class="mt-1 font-medium">{{ formatDate(result()?.manufactureDate) }}</div>
+          </div>
+
+          <div>
+            <div class="text-xs font-semibold uppercase tracking-wide text-muted">Expiry Date</div>
+            <div class="mt-1 font-medium">{{ formatDate(result()?.expiryDate) }}</div>
+          </div>
+
+          <div>
+            <div class="text-xs font-semibold uppercase tracking-wide text-muted">Verification Count</div>
+            <div class="mt-1 font-medium">{{ verificationCount() }}</div>
+          </div>
+        </div>
+
+        <div class="mt-5 flex flex-wrap gap-2">
+          <span
+            class="badge"
+            [class.badge-crimson]="result()?.suspicious"
+            [class.badge-silver]="!result()?.suspicious"
+          >
+            {{ result()?.suspicious ? 'Suspicious' : 'Not Suspicious' }}
+          </span>
+
+          <span
+            class="badge"
+            [class.badge-crimson]="+result()?.status === 3"
+            [class.badge-silver]="+result()?.status !== 3"
+          >
+            {{ +result()?.status === 3 ? 'Recalled' : 'Not Recalled' }}
+          </span>
+
+          <span
+            class="badge"
+            [class.badge-emerald]="+result()?.status === 2"
+            [class.badge-silver]="+result()?.status !== 2"
+          >
+            {{ +result()?.status === 2 ? 'Delivered' : 'In Supply Chain' }}
+          </span>
+        </div>
+      </div>
     }
   </div>
 </div>

@@ -1,92 +1,144 @@
-<div class="min-h-[calc(100vh-64px)] flex items-center justify-center p-6">
+<div class="card max-w-3xl mx-auto">
+  <div class="card-body">
+    <div class="mb-6 text-center">
+      <h1 class="text-2xl font-extrabold">Create Account</h1>
+      <p class="mt-2 text-sm text-muted">
+        Register to access the blockchain pharmaceutical traceability platform.
+      </p>
+    </div>
 
-  <div class="card w-full max-w-lg">
-    <div class="card-body">
-
-      <div class="mb-6">
-        <h1 class="text-2xl font-extrabold">Create Account</h1>
-        <p class="text-sm text-muted">Register for '' Pharma Trace</p>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-4 md:grid-cols-2">
+      <div class="md:col-span-2">
+        <label class="label">Full Name</label>
+        <input class="input" formControlName="fullName" placeholder="Enter your full name" />
+        @if (f.fullName.touched && f.fullName.invalid) {
+          <small class="help text-crimson-600">
+            Full name is required and must be at least 2 characters.
+          </small>
+        }
       </div>
 
-      <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
+      <div>
+        <label class="label">Email</label>
+        <input class="input" type="email" formControlName="email" placeholder="Enter your email" />
+        @if (f.email.touched && f.email.invalid) {
+          <small class="help text-crimson-600">
+            Enter a valid email address.
+          </small>
+        }
+      </div>
 
-        <!-- Full Name -->
-        <div>
-          <label class="label">Full Name</label>
-          <input class="input" formControlName="fullName" />
+      <div>
+        <label class="label">Password</label>
+        <input class="input" type="password" formControlName="password" placeholder="Enter password" />
+        @if (f.password.touched && f.password.invalid) {
+          <small class="help text-crimson-600">
+            Password must be at least 8 characters.
+          </small>
+        }
+      </div>
+
+      <div class="md:col-span-2">
+        <label class="label">Role</label>
+        <select class="input" formControlName="role">
+          <option value="patient">Patient</option>
+          <option value="manufacturer">Manufacturer</option>
+          <option value="distributor">Distributor</option>
+          <option value="pharmacy">Pharmacy</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+
+      <div class="md:col-span-2">
+        <label class="label">Wallet Address</label>
+
+        <div class="flex flex-col gap-2 md:flex-row">
+          <input
+            class="input"
+            formControlName="walletAddress"
+            placeholder="Connect MetaMask or paste wallet address"
+          />
+
+          <button
+            type="button"
+            class="btn btn-primary whitespace-nowrap"
+            (click)="connectMetaMask()"
+            [disabled]="walletLoading"
+          >
+            {{ walletLoading ? 'Connecting...' : 'Connect MetaMask' }}
+          </button>
         </div>
 
-        <!-- Email -->
-        <div>
-          <label class="label">Email</label>
-          <input class="input" formControlName="email" />
-        </div>
-
-        <!-- Password -->
-        <div>
-          <label class="label">Password</label>
-          <input type="password" class="input" formControlName="password" />
-        </div>
-
-        <!-- Role -->
-        <div>
-          <label class="label">Role</label>
-          <select class="input" formControlName="role">
-            <option value="admin">Admin</option>
-            <option value="manufacturer">Manufacturer</option>
-            <option value="distributor">Distributor</option>
-            <option value="pharmacy">Pharmacy</option>
-            <option value="patient">Patient</option>
-          </select>
-        </div>
-
-        <!-- Wallet -->
-        <div>
-          <label class="label">Wallet Address</label>
-          <input class="input" formControlName="walletAddress" />
-        </div>
-
-        <!-- Organization -->
-        <div>
-          <label class="label">Organization</label>
-          <input class="input" formControlName="organizationName" />
-        </div>
-
-        <!-- Phone -->
-        <div>
-          <label class="label">Phone</label>
-          <input class="input" formControlName="phone" />
-        </div>
-
-        <!-- Error -->
-        @if (error) {
-          <div class="alert alert-danger">
-            {{ error }}
-          </div>
+        @if (wallet.isConnected()) {
+          <small class="help text-emerald-600">
+            Connected: {{ wallet.account() }}
+          </small>
         }
 
-        <!-- Success -->
-        @if (success) {
-          <div class="alert alert-success">
-            {{ success }}
-          </div>
+        @if (!wallet.hasMetaMask()) {
+          <small class="help text-crimson-600">
+            MetaMask is not installed in this browser.
+          </small>
         }
+      </div>
 
-        <!-- Submit -->
+      @if (isOrganizationRole) {
+        <div class="md:col-span-2 mt-2 rounded-2xl border border-border bg-surface-2 p-4">
+          <div class="mb-3 text-sm font-semibold">Organization Details</div>
+
+          <div class="grid gap-4 md:grid-cols-2">
+            <div>
+              <label class="label">Organization Name</label>
+              <input class="input" formControlName="organizationName" placeholder="Enter company or organization name" />
+            </div>
+
+            <div>
+              <label class="label">Phone</label>
+              <input class="input" formControlName="phone" placeholder="Enter phone number" />
+            </div>
+
+            <div class="md:col-span-2">
+              <label class="label">Address</label>
+              <input class="input" formControlName="address" placeholder="Enter organization address" />
+            </div>
+
+            <div>
+              <label class="label">Country</label>
+              <input class="input" formControlName="country" placeholder="Enter country" />
+            </div>
+
+            <div>
+              <label class="label">Website</label>
+              <input class="input" formControlName="website" placeholder="Enter website URL" />
+            </div>
+          </div>
+        </div>
+      }
+
+      <div class="md:col-span-2 mt-2">
         <button class="btn btn-primary w-full" [disabled]="loading">
-          {{ loading ? 'Creating...' : 'Create Account' }}
+          {{ loading ? 'Creating Account...' : 'Register' }}
         </button>
+      </div>
+    </form>
 
-        <div class="text-center text-sm text-muted">
-          Already have an account?
-          <a routerLink="/auth" class="font-semibold text-foreground hover:underline">
-            Login
-          </a>
-        </div>
+    @if (success) {
+      <div class="alert alert-success mt-6">
+        {{ success }}
+      </div>
+    }
 
-      </form>
+    @if (error) {
+      <div class="alert alert-danger mt-6">
+        {{ error }}
+      </div>
+    }
 
+    <div class="mt-6 text-center text-sm text-muted">
+      Already have an account?
+      <a routerLink="/auth" class="font-semibold text-uzi-500 hover:underline">
+        Login
+      </a>
     </div>
   </div>
-
 </div>

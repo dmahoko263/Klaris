@@ -12,6 +12,9 @@ export interface RegisterPayload {
   role: UserRole;
   walletAddress?: string;
   organizationName?: string;
+  address?: string;
+  country?: string;
+  website?: string;
   phone?: string;
 }
 
@@ -25,6 +28,12 @@ export interface AuthUser {
   email: string;
   role: UserRole;
   walletAddress?: string;
+  fullName?: string | null;
+  phone?: string | null;
+  organizationName?: string | null;
+  address?: string | null;
+  country?: string | null;
+  website?: string | null;
 }
 
 export interface AuthResponse {

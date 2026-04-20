@@ -1,0 +1,91 @@
+<div class="card max-w-3xl mx-auto">
+  <div class="card-body p-6 md:p-8">
+    <div class="mb-6 border-b border-border pb-4">
+      <h1 class="text-2xl font-extrabold text-foreground">Transfer Ownership</h1>
+      <p class="mt-1 text-sm text-muted">
+        Transfer a registered pharmaceutical batch to the next supply chain participant.
+      </p>
+    </div>
+
+    <div class="mb-6 rounded-2xl border border-blue-200 bg-blue-50/70 p-4">
+      <div class="text-sm font-semibold text-blue-700">Supply Chain Action</div>
+      <div class="mt-1 text-sm text-muted">
+        Use this to move a batch from manufacturer to distributor, or distributor to pharmacy.
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-5 md:grid-cols-2">
+      <div>
+        <label class="label">Batch ID</label>
+        <input
+          class="input"
+          type="number"
+          formControlName="batchId"
+          placeholder="Enter batch ID"
+        />
+        @if (f.batchId.touched && f.batchId.invalid) {
+          <small class="mt-1 block text-xs text-red-600">
+            Batch ID is required.
+          </small>
+        }
+      </div>
+
+      <div>
+        <label class="label">New Owner Wallet Address</label>
+        <input
+          class="input font-mono"
+          type="text"
+          formControlName="newOwner"
+          placeholder="0x..."
+        />
+        @if (f.newOwner.touched && f.newOwner.invalid) {
+          <small class="mt-1 block text-xs text-red-600">
+            Enter a valid Ethereum wallet address.
+          </small>
+        }
+      </div>
+
+      <div class="md:col-span-2">
+        <label class="label">Transfer Note</label>
+        <textarea
+          class="input min-h-[120px] resize-y"
+          formControlName="note"
+          placeholder="Optional note about this ownership transfer"
+        ></textarea>
+      </div>
+
+      <div class="md:col-span-2 flex flex-col gap-3 pt-2">
+        <button class="btn btn-primary h-12 text-base font-bold" [disabled]="loading()">
+          {{ loading() ? 'Transferring...' : 'Transfer Ownership' }}
+        </button>
+      </div>
+    </form>
+
+    @if (hasSuccess()) {
+      <div class="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
+        <div class="font-semibold text-emerald-700">Ownership transferred successfully</div>
+        <div class="mt-1 text-sm text-emerald-800">
+          {{ successMessage() }}
+        </div>
+
+        @if (result()?.txHash) {
+          <div class="mt-2 break-all text-sm text-emerald-800">
+            <span class="font-semibold">Tx Hash:</span> {{ result()?.txHash }}
+          </div>
+        }
+
+        @if (result()?.blockNumber) {
+          <div class="mt-1 text-sm text-emerald-800">
+            <span class="font-semibold">Block:</span> {{ result()?.blockNumber }}
+          </div>
+        }
+      </div>
+    }
+
+    @if (error()) {
+      <div class="mt-6 rounded-2xl border border-crimson-200 bg-crimson-50 p-4 text-crimson-700">
+        {{ error() }}
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,82 @@
+.scanner-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: black;
+  overflow: hidden;
+}
+
+/* CAMERA FULLSCREEN */
+zxing-scanner {
+  width: 100%;
+  height: 100%;
+}
+
+/* OVERLAY FRAME */
+.scan-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scan-box {
+  width: 260px;
+  height: 260px;
+  border: 2px solid #00ffcc;
+  border-radius: 16px;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 255, 204, 0.4);
+}
+
+/* ANIMATED SCAN LINE */
+.scan-line {
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  background: #00ffcc;
+  animation: scan 2s infinite;
+}
+
+@keyframes scan {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+/* OVERLAYS */
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+/* LOADING */
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #333;
+  border-top: 4px solid #00ffcc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ERROR */
+.error button {
+  margin-top: 12px;
+  padding: 10px 20px;
+  background: #00ffcc;
+  border: none;
+  border-radius: 8px;
+  color: black;
+  font-weight: bold;
+}

@@ -1,5 +1,10 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { AuthResponse, AuthUser, LoginPayload, RegisterPayload } from '../models/auth.model';
+import {
+  AuthResponse,
+  AuthUser,
+  LoginPayload,
+  RegisterPayload,
+} from '../models/auth.model';
 import { environment } from '../../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -21,22 +26,29 @@ export class AuthService {
   userRole = computed(() => this.currentUserSignal()?.role ?? null);
 
   register(payload: RegisterPayload) {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, payload);
+    return this.http.post<AuthResponse>(
+      `${environment.apiUrl}/auth/register`,
+      payload
+    );
   }
 
   login(payload: LoginPayload) {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, payload);
+    return this.http.post<AuthResponse>(
+      `${environment.apiUrl}/auth/login`,
+      payload
+    );
   }
 
   saveSession(response: AuthResponse) {
     localStorage.setItem(this.TOKEN_KEY, response.token);
     localStorage.setItem(this.USER_KEY, JSON.stringify(response.user));
-    console.log(response.user)
     this.currentUserSignal.set(response.user);
   }
- getMe() {
+
+  getMe() {
     return this.currentUser;
   }
+
   logout() {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);

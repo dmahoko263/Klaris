@@ -1,0 +1,155 @@
+<div class="card max-w-3xl mx-auto">
+  <div class="card-body p-6 md:p-8">
+    <div class="mb-6 border-b border-border pb-4">
+      <h1 class="text-2xl font-extrabold text-foreground">Grant Wallet Role</h1>
+      <p class="mt-1 text-sm text-muted">
+        Connect the admin wallet in MetaMask, then grant a role to another wallet address.
+      </p>
+    </div>
+
+    @if (!isAdmin()) {
+      <div class="alert alert-danger mb-6">
+        Only admins can access this page.
+      </div>
+    }
+
+    <div class="mb-6 rounded-2xl border border-uzi-200 bg-uzi-50/60 p-4">
+      <div class="text-sm font-semibold text-uzi-700">How this works</div>
+      <div class="mt-1 text-sm text-muted">
+        The connected MetaMask wallet is the admin signer. The wallet address below is the target account that will receive the selected role.
+      </div>
+    </div>
+
+    <div class="mb-5 flex flex-wrap items-center gap-3">
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="connectMetaMask()"
+        [disabled]="walletLoading()"
+      >
+        {{ walletLoading() ? 'Connecting...' : 'Connect Admin MetaMask' }}
+      </button>
+
+      @if (walletConnected()) {
+        <div
+          class="card flex items-center gap-3 px-4 py-2"
+          [title]="connectedWallet() || ''"
+        >
+          <div class="badge badge-emerald">Admin Connected</div>
+          <div class="flex flex-col text-left">
+            <span class="text-xs text-muted">Signer Wallet</span>
+            <span class="font-mono text-sm font-semibold text-foreground">
+              {{ shortAddress(connectedWallet()) }}
+            </span>
+          </div>
+        </div>
+      }
+
+      @if (!hasMetaMask()) {
+        <div class="text-sm text-crimson-600">
+          MetaMask is not installed in this browser.
+        </div>
+      }
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="grid gap-5">
+      <div>
+        <label class="label">Hardhat Account Preset</label>
+        <div class="flex flex-col gap-2 md:flex-row">
+          <select class="input" formControlName="selectedPreset">
+            <option value="">Select a known Hardhat account</option>
+            @for (item of hardhatAccounts; track item.address) {
+              <option [value]="item.address">
+                {{ item.label }} — {{ item.address }}
+              </option>
+            }
+          </select>
+
+          <button
+            type="button"
+            class="btn btn-ghost whitespace-nowrap"
+            (click)="applyPreset()"
+          >
+            Use Preset
+          </button>
+        </div>
+        <small class="help">
+          This fills the target wallet and suggested role. The connected admin wallet is not changed.
+        </small>
+      </div>
+
+      <div>
+        <label class="label">Role to Grant</label>
+        <select class="input" formControlName="role">
+          <option value="manufacturer">Manufacturer</option>
+          <option value="distributor">Distributor</option>
+          <option value="pharmacy">Pharmacy</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="label">Target Wallet Address</label>
+        <input
+          class="input font-mono"
+          type="text"
+          formControlName="account"
+          placeholder="Paste manufacturer / distributor / pharmacy wallet"
+        />
+        <small class="help">
+          Enter the wallet that should receive the selected role.
+        </small>
+
+        @if (f.account.touched && f.account.invalid) {
+          <small class="help text-crimson-600">
+            Enter a valid Ethereum wallet address.
+          </small>
+        }
+      </div>
+
+      <div class="pt-2">
+        <button
+          class="btn btn-primary h-12 w-full text-base font-bold"
+          [disabled]="loading() || !isAdmin()"
+        >
+          {{ loading() ? 'Granting...' : 'Grant Role' }}
+        </button>
+      </div>
+    </form>
+
+    @if (hasSuccess()) {
+      <div class="alert alert-success mt-6">
+        <div class="font-semibold">{{ successMessage() }}</div>
+
+        @if (result()?.account) {
+          <div class="mt-2 text-sm">
+            <span class="font-semibold">Target Wallet:</span> {{ result()?.account }}
+          </div>
+        }
+
+        @if (result()?.from) {
+          <div class="mt-1 text-sm">
+            <span class="font-semibold">Granted By:</span> {{ result()?.from }}
+          </div>
+        }
+
+        @if (result()?.txHash) {
+          <div class="mt-1 break-all text-sm">
+            <span class="font-semibold">Tx Hash:</span> {{ result()?.txHash }}
+          </div>
+        }
+
+        @if (result()?.blockNumber) {
+          <div class="mt-1 text-sm">
+            <span class="font-semibold">Block:</span> {{ result()?.blockNumber }}
+          </div>
+        }
+      </div>
+    }
+
+    @if (error()) {
+      <div class="alert alert-danger mt-6">
+        {{ error() }}
+      </div>
+    }
+  </div>
+</div>

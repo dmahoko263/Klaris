@@ -1,7 +1,5 @@
 @import "tailwindcss";
-@import "../styles/components.css";
-@import "../styles/theme.css";
-@import "../styles/theme.dark.css";
+
 .nav-item {
   @apply mx-3 flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold
          text-muted hover:bg-uzi-500/10 hover:text-uzi-500 transition;
@@ -9,4 +7,269 @@
 
 .nav-item-active {
   @apply bg-uzi-500/10 text-uzi-500;
+}
+
+/* src/styles/theme.css */
+@theme {
+  /* =========================
+     BRAND COLORS
+     ========================= */
+
+  /* UZINDUZI Red (logo primary) */
+  --color-uzi-50:  #FFF1F1;
+  --color-uzi-100: #FFE1E1;
+  --color-uzi-200: #FFC7C7;
+  --color-uzi-300: #FF9B9B;
+  --color-uzi-400: #FF5C5C;
+  --color-uzi-500: #FF0000; /* 🔥 from logo */
+  --color-uzi-600: #D90000;
+  --color-uzi-700: #B30000;
+  --color-uzi-800: #8C0000;
+  --color-uzi-900: #5C0000;
+
+  /* Gold */
+  --color-gold-50:  #FFFBEB;
+  --color-gold-100: #FFF3C4;
+  --color-gold-200: #FFE08A;
+  --color-gold-300: #F7C948;
+  --color-gold-400: #E9B949;
+  --color-gold-500: #D4AF37; /* classic gold */
+  --color-gold-600: #B68F1F;
+  --color-gold-700: #8F6B10;
+  --color-gold-800: #6B4E0A;
+  --color-gold-900: #463205;
+
+  /* Emerald */
+  --color-emerald-50:  #ECFDF5;
+  --color-emerald-100: #D1FAE5;
+  --color-emerald-200: #A7F3D0;
+  --color-emerald-300: #6EE7B7;
+  --color-emerald-400: #34D399;
+  --color-emerald-500: #10B981;
+  --color-emerald-600: #059669;
+  --color-emerald-700: #047857;
+  --color-emerald-800: #065F46;
+  --color-emerald-900: #064E3B;
+
+  /* Crimson (distinct from logo-red; use for danger/alerts) */
+  --color-crimson-50:  #FFF1F3;
+  --color-crimson-100: #FFE4E8;
+  --color-crimson-200: #FECDD3;
+  --color-crimson-300: #FDA4AF;
+  --color-crimson-400: #FB7185;
+  --color-crimson-500: #DC143C; /* crimson */
+  --color-crimson-600: #BE123C;
+  --color-crimson-700: #9F1239;
+  --color-crimson-800: #881337;
+  --color-crimson-900: #4C0519;
+
+  /* Silver */
+  --color-silver-50:  #F8FAFC;
+  --color-silver-100: #F1F5F9;
+  --color-silver-200: #E2E8F0;
+  --color-silver-300: #CBD5E1;
+  --color-silver-400: #94A3B8;
+  --color-silver-500: #C0C0C0; /* classic silver */
+  --color-silver-600: #64748B;
+  --color-silver-700: #475569;
+  --color-silver-800: #1F2937;
+  --color-silver-900: #0F172A;
+
+  /* =========================
+     SEMANTIC TOKENS (use everywhere)
+     ========================= */
+  --color-background: #FFFFFF;
+  --color-foreground: #0B0B0D;
+
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F8FAFC;
+
+  --color-muted: #64748B;
+  --color-border: #E5E7EB;
+
+  --color-primary: var(--color-uzi-500);
+  --color-on-primary: #FFFFFF;
+
+  --color-accent: var(--color-gold-500);
+  --color-on-accent: #0B0B0D;
+
+  --color-success: var(--color-emerald-500);
+  --color-danger: var(--color-crimson-500);
+
+  /* =========================
+     TYPOGRAPHY
+     ========================= */
+  --font-body: Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-display: Inter, ui-sans-serif, system-ui, sans-serif;
+
+  /* =========================
+     RADII / SHADOWS
+     ========================= */
+  --radius-card: 1rem;
+  --radius-btn: 0.85rem;
+
+  --shadow-card: 0 12px 30px rgb(0 0 0 / 0.08);
+  --shadow-pop: 0 18px 60px rgb(0 0 0 / 0.16);
+}
+@layer components {
+  /* ====== Layout ====== */
+  .app-shell {
+    @apply min-h-screen bg-background text-foreground;
+  }
+
+  .app-header {
+    @apply sticky top-0 z-40 border-b border-border bg-surface/90 backdrop-blur;
+  }
+
+  .app-container {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .card {
+    border-radius: var(--radius-card);
+    box-shadow: var(--shadow-card);
+    @apply border border-border bg-surface;
+  }
+
+  .card-body {
+    @apply p-5 sm:p-6;
+  }
+
+  /* ====== Buttons ====== */
+  .btn {
+    border-radius: var(--radius-btn);
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold
+           transition focus:outline-none focus:ring-2 focus:ring-offset-2
+           disabled:opacity-60 disabled:pointer-events-none;
+    /* ring offset uses surface */
+    --tw-ring-offset-color: var(--color-surface);
+  }
+
+  .btn-primary {
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    @apply hover:brightness-110 active:brightness-95;
+  }
+
+  .btn-accent {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    @apply hover:brightness-110 active:brightness-95;
+  }
+
+  .btn-ghost {
+    @apply border border-border bg-transparent hover:bg-surface-2;
+  }
+
+  .btn-danger {
+    background: var(--color-danger);
+    color: #fff;
+    @apply hover:brightness-110 active:brightness-95;
+  }
+
+  /* ====== Inputs ====== */
+  .input {
+    @apply w-full rounded-[0.85rem] border border-border
+           bg-surface px-3 py-2 text-sm
+           focus:outline-none focus:ring-2
+           transition;
+  }
+
+  .input-error {
+    @apply border-rose-500 focus:ring-0;
+  }
+
+  .input-valid {
+    @apply focus:ring-uzi-500;
+  }
+
+
+  .label {
+    @apply mb-1 block text-sm font-semibold;
+  }
+
+  .help {
+    @apply mt-1 text-xs text-muted;
+  }
+
+  /* ====== Badges ====== */
+  .badge {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
+  }
+
+  .badge-primary { @apply bg-uzi-500 text-white; }
+  .badge-gold    { @apply bg-gold-500 text-black; }
+  .badge-emerald { @apply bg-emerald-500 text-white; }
+  .badge-silver  { @apply bg-silver-200 text-black; }
+  .badge-crimson { @apply bg-crimson-500 text-white; }
+
+  /* ====== Alerts ====== */
+  .alert {
+    border-radius: 1rem;
+    @apply border border-border bg-surface-2 p-4;
+  }
+
+  .alert-success {
+    @apply border-emerald-200 bg-emerald-50 text-emerald-800
+           dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-100;
+  }
+
+  .alert-danger {
+    @apply border-rose-200 bg-rose-50 text-rose-800
+           dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-100;
+  }
+
+  /* ====== Tables ====== */
+  .table {
+    @apply w-full overflow-hidden rounded-2xl border border-border bg-surface;
+  }
+
+  .table th {
+    @apply bg-surface-2 px-4 py-3 text-left text-xs font-bold uppercase tracking-wide text-muted;
+  }
+
+  .table td {
+    @apply border-t border-border px-4 py-3 text-sm;
+  }
+
+  .table tr:hover td {
+    @apply bg-surface-2/60;
+  }
+
+  /* ====== Sidebar (no-scroll style baseline) ====== */
+  .sidebar {
+    @apply h-screen w-72 border-r border-border bg-surface;
+  }
+
+  .sidebar-title {
+    @apply px-5 py-4 text-lg font-extrabold tracking-tight;
+  }
+
+  .nav-item {
+    @apply mx-3 flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold
+           text-muted hover:bg-surface-2 hover:text-foreground;
+  }
+
+  .nav-item-active {
+    @apply bg-surface-2 text-foreground;
+  }
+  
+}
+/* src/styles/theme.dark.css */
+.dark {
+  --color-background: #0B0B0D;
+  --color-foreground: #F8FAFC;
+
+  --color-surface: #101114;
+  --color-surface-2: #15161A;
+
+  --color-muted: #A1A1AA;
+  --color-border: #26272B;
+
+  /* Keep brand loud in dark */
+  --color-primary: var(--color-uzi-500);
+  --color-on-primary: #FFFFFF;
+
+  --color-accent: var(--color-gold-400);
+  --color-on-accent: #0B0B0D;
 }
