@@ -7,31 +7,45 @@ import { initBatchCache, BatchCache } from "./BatchCache.js";
 import { initWalletRole, WalletRole } from "./walletRole.js";
 import { initOwnershipTransfer, OwnershipTransfer } from "./OwnershipTransfer.js";
 import { initContractDeployment, ContractDeployment } from "./ContractDeployment.js";
+import { initNetworkActivity, NetworkActivity } from "./NetworkActivity.js";
+
 export function initModels() {
   initUser(sequelize);
   initUserProfile(sequelize);
   initVerification(sequelize);
   initAuditLog(sequelize);
   initBatchCache(sequelize);
-  
-initWalletRole(sequelize);
-initOwnershipTransfer(sequelize);
-initContractDeployment(sequelize);
+  initWalletRole(sequelize);
+  initOwnershipTransfer(sequelize);
+  initContractDeployment(sequelize);
+  initNetworkActivity(sequelize);
 
   // associations
-  User.hasOne(UserProfile, { foreignKey: { name: "userId", allowNull: false }, onDelete: "CASCADE" });
-  UserProfile.belongsTo(User, { foreignKey: "userId" });
+  User.hasOne(UserProfile, {
+    as: "profile",
+    foreignKey: { name: "userId", allowNull: false },
+    onDelete: "CASCADE",
+  });
 
-  User.hasMany(Verification, { foreignKey: { name: "scannedByUserId", allowNull: true } });
+  UserProfile.belongsTo(User, {
+    foreignKey: "userId",
+  });
+
+  User.hasMany(Verification, {
+    foreignKey: { name: "scannedByUserId", allowNull: true },
+  });
   Verification.belongsTo(User, { foreignKey: "scannedByUserId" });
 
-  User.hasMany(AuditLog, { foreignKey: { name: "actorUserId", allowNull: true } });
+  User.hasMany(AuditLog, {
+    foreignKey: { name: "actorUserId", allowNull: true },
+  });
   AuditLog.belongsTo(User, { foreignKey: "actorUserId" });
 
-  return { User, UserProfile, Verification, AuditLog, BatchCache };
+  return { User, UserProfile, Verification, AuditLog, BatchCache, NetworkActivity };
 }
 
-export {  sequelize,
+export {
+  sequelize,
   User,
   UserProfile,
   Verification,
@@ -39,4 +53,6 @@ export {  sequelize,
   BatchCache,
   WalletRole,
   OwnershipTransfer,
-  ContractDeployment,};
+  ContractDeployment,
+  NetworkActivity,
+};

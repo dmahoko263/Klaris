@@ -1,15 +1,20 @@
 import { z } from "zod";
 import { registerUser, loginUser } from "../services/auth.service.js";
-import { User } from "../models/index.js";
+import { User, UserProfile } from "../models/index.js";
 import { ethers } from "ethers";
 
 const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  role: z.enum(["admin", "manufacturer", "distributor", "patient"]).default("patient"),
+  role: z
+    .enum(["admin", "manufacturer", "distributor", "pharmacy", "patient"])
+    .default("patient"),
   fullName: z.string().min(2),
   phone: z.string().optional(),
   organizationName: z.string().optional(),
+  address: z.string().optional(),
+  country: z.string().optional(),
+  website: z.string().optional(),
   walletAddress: z.string().optional(),
 });
 
@@ -36,11 +41,50 @@ export async function login(req, res) {
 export async function getAllUsers(req, res) {
   try {
     const users = await User.findAll({
-      attributes: ["id", "email", "role", "walletAddress", "isActive", "createdAt"],
+      attributes: [
+        "id",
+        "email",
+        "role",
+        "walletAddress",
+        "isActive",
+        "createdAt",
+      ],
+      include: [
+        {
+          model: UserProfile,
+          as: "profile",
+          attributes: [
+            "fullName",
+            "phone",
+            "organizationName",
+            "address",
+            "country",
+            "website",
+          ],
+        },
+      ],
       order: [["createdAt", "DESC"]],
     });
-    res.json({ ok: true, users });
+
+    res.json({
+      ok: true,
+      users: users.map((user) => ({
+        id: user.id,
+        email: user.email,
+        role: user.role,
+        walletAddress: user.walletAddress,
+        isActive: user.isActive,
+        createdAt: user.createdAt,
+        fullName: user.profile?.fullName || null,
+        phone: user.profile?.phone || null,
+        organizationName: user.profile?.organizationName || null,
+        address: user.profile?.address || null,
+        country: user.profile?.country || null,
+        website: user.profile?.website || null,
+      })),
+    });
   } catch (e) {
+    console.error("GET_ALL_USERS_ERROR:", e);
     res.status(500).json({ ok: false, error: e.message });
   }
 }
@@ -51,24 +95,30 @@ export async function updateUserWallet(req, res) {
     const { walletAddress } = req.body;
 
     if (!walletAddress) {
-      return res.status(400).json({ ok: false, error: "Wallet address is required" });
+      return res
+        .status(400)
+        .json({ ok: false, error: "Wallet address is required" });
     }
 
-    // Validate and checksum the address
     let checksummed;
     try {
       checksummed = ethers.getAddress(walletAddress);
     } catch {
-      return res.status(400).json({ ok: false, error: "Invalid Ethereum address" });
+      return res
+        .status(400)
+        .json({ ok: false, error: "Invalid Ethereum address" });
     }
 
     const user = await User.findByPk(id);
-    if (!user) return res.status(404).json({ ok: false, error: "User not found" });
+    if (!user) {
+      return res.status(404).json({ ok: false, error: "User not found" });
+    }
 
-    // Check not already taken by another user
     const existing = await User.findOne({ where: { walletAddress: checksummed } });
     if (existing && existing.id !== id) {
-      return res.status(409).json({ ok: false, error: "Wallet address already in use" });
+      return res
+        .status(409)
+        .json({ ok: false, error: "Wallet address already in use" });
     }
 
     await user.update({ walletAddress: checksummed });
@@ -91,8 +141,13 @@ export async function toggleUserActive(req, res) {
   try {
     const { id } = req.params;
     const user = await User.findByPk(id);
-    if (!user) return res.status(404).json({ ok: false, error: "User not found" });
+
+    if (!user) {
+      return res.status(404).json({ ok: false, error: "User not found" });
+    }
+
     await user.update({ isActive: !user.isActive });
+
     res.json({ ok: true, isActive: user.isActive });
   } catch (e) {
     res.status(500).json({ ok: false, error: e.message });
