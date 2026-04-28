@@ -108,4 +108,20 @@ export class OwnershipHistory {
       console.error('COPY_ERROR:', err);
     });
   }
+shortBatchId(id?: string | number): string {
+  if (id === undefined || id === null) {
+    return '—';
+  }
+
+  const value = String(id).trim();
+
+  if (!value) {
+    return '—';
+  }
+
+  return value.length > 5
+    ? `${value.slice(0, 5)}...`
+    : value;
+}
+
 }

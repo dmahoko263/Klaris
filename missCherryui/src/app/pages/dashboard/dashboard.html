@@ -149,9 +149,16 @@
           <tbody>
             @for (batch of batches(); track batch.batchId) {
               <tr>
-                <td class="font-semibold text-foreground">
-                  {{ batch.batchId }}
-                </td>
+             <td>
+  <button
+    type="button"
+    class="inline-flex cursor-pointer rounded-xl border border-border bg-muted px-3 py-1 font-mono text-sm font-semibold text-foreground transition hover:shadow-[var(--shadow-pop)]"
+    [title]="'Click to copy: ' + batch.batchId"
+    (click)="copyBatchId(batch.batchId)"
+  >
+    {{ shortBatchId(batch.batchId) }}
+  </button>
+</td>
 
                 <td>
                   <div class="font-semibold text-foreground">{{ batch.drugName }}</div>

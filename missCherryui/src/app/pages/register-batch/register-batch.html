@@ -139,10 +139,10 @@
         @if (registeredBatchId()) {
           <div class="mt-1 break-all text-sm text-emerald-800">
             <span class="font-semibold">Generated Batch ID:</span>
-            {{ registeredBatchId() }}
+            {{ shortBatchId(registeredBatchId()) }}
           </div>
         }
-
+        
         <div class="mt-1 text-sm text-emerald-800">
           <span class="font-semibold">Tx Hash:</span> {{ result()?.txHash }}
         </div>

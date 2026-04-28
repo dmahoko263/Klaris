@@ -48,7 +48,6 @@ export class Dashboard implements OnInit, OnDestroy {
   auth = inject(AuthService);
   pharma = inject(PharmaService);
   wallet = inject(WalletService);
-
   private refreshIntervalId: ReturnType<typeof setInterval> | null = null;
 
   role = computed(() => this.auth.currentUser()?.role);
@@ -59,6 +58,8 @@ export class Dashboard implements OnInit, OnDestroy {
   batches = signal<Batch[]>([]);
   loadingBatches = signal(false);
   batchesError = signal('');
+  
+successMessage=signal('');
 
   walletLoading = signal(false);
   walletError = signal('');
@@ -278,4 +279,37 @@ copyWalletAddress() {
     if (this.isExpired(batch)) return 'Expired';
     return this.statusLabel(batch.status);
   }
+
+ shortBatchId(id?: string | number): string {
+  if (id === undefined || id === null) {
+    return '—';
+  }
+
+  const value = String(id).trim();
+
+  if (!value) {
+    return '—';
+  }
+
+  return value.length > 5
+    ? `${value.slice(0, 5)}...`
+    : value;
+}
+
+copyBatchId(id?: string | number): void {
+  if (id === undefined || id === null) return;
+
+  const value = String(id).trim();
+  if (!value) return;
+
+  navigator.clipboard.writeText(value)
+    .then(() => {
+      console.log('Batch ID copied:', value);
+      // optional:
+      this.successMessage.set('Batch ID copied');
+    })
+    .catch((error) => {
+      console.error('Failed to copy Batch ID:', error);
+    });
+}
 }

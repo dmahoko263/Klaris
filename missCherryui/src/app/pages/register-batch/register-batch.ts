@@ -251,4 +251,38 @@ export class RegisterBatch {
   printLabel() {
     window.print();
   }
+shortBatchId(id?: string | number | null): string {
+  if (id === undefined || id === null) {
+    return '—';
+  }
+
+  const value = String(id).trim();
+
+  if (!value) {
+    return '—';
+  }
+
+  return value.length > 5
+    ? `${value.slice(0, 5)}...`
+    : value;
+}
+
+copyBatchId(id?: string | number | null): void {
+  if (id === undefined || id === null) return;
+
+  const value = String(id).trim();
+
+  if (!value) return;
+
+  navigator.clipboard.writeText(value)
+    .then(() => {
+      this.successMessage.set('Batch ID copied');
+      console.log('Batch ID copied:', value);
+    })
+    .catch((error) => {
+      console.error('Failed to copy Batch ID:', error);
+      this.error.set('Failed to copy Batch ID');
+    });
+}
+
 }

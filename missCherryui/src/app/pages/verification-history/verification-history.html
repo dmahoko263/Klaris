@@ -10,16 +10,11 @@
     <form [formGroup]="form" (ngSubmit)="load()" class="grid gap-4 md:grid-cols-[1fr_auto_auto]">
       <div>
         <label class="label">Batch ID</label>
-        <input
-          class="input"
-          type="number"
-          formControlName="batchId"
-          placeholder="Enter batch ID"
-        />
+        <input class="input" type="text" formControlName="batchId" placeholder="Enter batch ID" />
         @if (f.batchId.touched && f.batchId.invalid) {
-          <small class="mt-1 block text-xs text-red-600">
-            Batch ID is required.
-          </small>
+        <small class="mt-1 block text-xs text-red-600">
+          Batch ID is required.
+        </small>
         }
       </div>
 
@@ -37,68 +32,64 @@
     </form>
 
     @if (error()) {
-      <div class="mt-6 rounded-2xl border border-crimson-200 bg-crimson-50 p-4 text-crimson-700">
-        {{ error() }}
-      </div>
+    <div class="mt-6 rounded-2xl border border-crimson-200 bg-crimson-50 p-4 text-crimson-700">
+      {{ error() }}
+    </div>
     }
 
     @if (searchedBatchId()) {
-      <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-        <div class="text-sm text-slate-700">
-          Showing verification history for batch:
-          <span class="font-semibold">{{ searchedBatchId() }}</span>
-        </div>
+    <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <div class="text-sm text-slate-700">
+        Showing verification history for batch:
+        <span class="font-semibold">{{ shortBatchId(searchedBatchId()) }}</span>
       </div>
+    </div>
     }
 
     @if (hasEntries()) {
-      <div class="mt-6 space-y-4">
-        @for (entry of entries(); track $index) {
-          <div class="rounded-2xl border border-border bg-white p-5 shadow-sm">
-            <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-              <div class="space-y-2">
-                <div class="text-sm font-semibold text-foreground">
-                  Verification #{{ $index + 1 }}
-                </div>
+    <div class="mt-6 space-y-4">
+      @for (entry of entries(); track $index) {
+      <div class="rounded-2xl border border-border bg-white p-5 shadow-sm">
+        <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+          <div class="space-y-2">
+            <div class="text-sm font-semibold text-foreground">
+              Verification #{{ $index + 1 }}
+            </div>
 
-                <div class="text-sm">
-                  <span class="font-semibold">Verifier:</span>
-                  <span class="font-mono">{{ shortAddress(entry.verifier) }}</span>
-                </div>
+            <div class="text-sm">
+              <span class="font-semibold">Verifier:</span>
+              <span class="font-mono">{{ shortAddress(entry.verifier) }}</span>
+            </div>
 
-                <div class="text-sm">
-                  <span class="font-semibold">Timestamp:</span>
-                  {{ formatDate(entry.timestamp) }}
-                </div>
+            <div class="text-sm">
+              <span class="font-semibold">Timestamp:</span>
+              {{ formatDate(entry.timestamp) }}
+            </div>
 
-                <div class="text-sm">
-                  <span class="font-semibold">Result:</span>
-                  {{ entry.validAtScan ? 'Valid at scan' : 'Invalid at scan' }}
-                </div>
+            <div class="text-sm">
+              <span class="font-semibold">Result:</span>
+              {{ entry.validAtScan ? 'Valid at scan' : 'Invalid at scan' }}
+            </div>
 
-                <div class="text-sm">
-                  <span class="font-semibold">Note:</span>
-                  {{ entry.note || '—' }}
-                </div>
-              </div>
-
-              <div
-                class="rounded-full px-3 py-1 text-xs font-semibold"
-                [class.bg-emerald-100]="entry.validAtScan"
-                [class.text-emerald-700]="entry.validAtScan"
-                [class.bg-red-100]="!entry.validAtScan"
-                [class.text-red-700]="!entry.validAtScan"
-              >
-                {{ entry.validAtScan ? 'Verified' : 'Failed Verification' }}
-              </div>
+            <div class="text-sm">
+              <span class="font-semibold">Note:</span>
+              {{ entry.note || '—' }}
             </div>
           </div>
-        }
+
+          <div class="rounded-full px-3 py-1 text-xs font-semibold" [class.bg-emerald-100]="entry.validAtScan"
+            [class.text-emerald-700]="entry.validAtScan" [class.bg-red-100]="!entry.validAtScan"
+            [class.text-red-700]="!entry.validAtScan">
+            {{ entry.validAtScan ? 'Verified' : 'Failed Verification' }}
+          </div>
+        </div>
       </div>
+      }
+    </div>
     } @else if (!loading() && searchedBatchId() && !error()) {
-      <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center text-muted">
-        No verification history found for this batch.
-      </div>
+    <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-6 text-center text-muted">
+      No verification history found for this batch.
+    </div>
     }
   </div>
 </div>

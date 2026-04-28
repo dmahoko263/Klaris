@@ -16,7 +16,7 @@
         </div>
 
         <div class="text-sm">
-          <div><strong>Batch ID:</strong> {{ batchId }}</div>
+          <div><strong>Batch ID:</strong> {{ shortBatchId(batchId) }}</div>
           <div class="mt-2 break-all text-muted">{{ qrValue }}</div>
         </div>
       }
@@ -31,7 +31,7 @@
     </qrcode>
 
     <div class="mt-2 text-center text-xs text-slate-600">
-      Batch ID: {{ batchId }}
+      Batch ID: {{ shortBatchId(batchId) }}
     </div>
   </div>
 }

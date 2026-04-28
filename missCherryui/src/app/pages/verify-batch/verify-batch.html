@@ -21,6 +21,7 @@
           type="text"
           formControlName="batchId"
           placeholder="Enter batch ID"
+           (blur)="trimBatchId()"
         />
         @if (f.batchId.touched && f.batchId.invalid) {
           <small class="help text-crimson-600">

@@ -84,4 +84,21 @@ export class VerificationHistory {
     if (!value) return '—';
     return new Date(value * 1000).toLocaleString();
   }
+
+
+shortBatchId(id?: string | number): string {
+  if (id === undefined || id === null) {
+    return '—';
+  }
+
+  const value = String(id).trim();
+
+  if (!value) {
+    return '—';
+  }
+
+  return value.length > 5
+    ? `${value.slice(0, 5)}...`
+    : value;
+}
 }

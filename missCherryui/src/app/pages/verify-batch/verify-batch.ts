@@ -14,8 +14,8 @@ import { PharmaWeb3Service } from '../../core/services/pharma-web3.service';
 })
 export class VerifyBatch implements OnInit {
   private fb = inject(FormBuilder);
-  private pharma = inject(PharmaService); // read API
-  private pharmaWeb3 = inject(PharmaWeb3Service); // MetaMask write
+  private pharma = inject(PharmaService);
+  private pharmaWeb3 = inject(PharmaWeb3Service);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -30,42 +30,44 @@ export class VerifyBatch implements OnInit {
   });
 
   isVerified = computed(() => !!this.result()?.ok && !!this.result()?.valid);
-
   verifyReason = computed(() => this.result()?.reason || '');
-
-  verificationCount = computed(() =>
-    Number(this.result()?.verificationCount ?? 0)
-  );
+  verificationCount = computed(() => Number(this.result()?.verificationCount ?? 0));
 
   statusText = computed(() => {
     const status = Number(this.result()?.status ?? 0);
-
     switch (status) {
-      case 0:
-        return 'Registered';
-      case 1:
-        return 'In Transit';
-      case 2:
-        return 'Delivered';
-      case 3:
-        return 'Recalled';
-      default:
-        return 'Unknown';
+      case 0: return 'Registered';
+      case 1: return 'In Transit';
+      case 2: return 'Delivered';
+      case 3: return 'Recalled';
+      default: return 'Unknown';
     }
   });
 
   ngOnInit(): void {
-    const batchId =
+    const rawBatchId =
       this.route.snapshot.paramMap.get('batchId') ||
       this.route.snapshot.paramMap.get('id');
 
-    if (batchId) {
+    if (rawBatchId) {
+      const batchId = rawBatchId.trim(); // Trim URL params
       this.form.patchValue({ batchId });
       this.autoTriggered.set(true);
 
       setTimeout(() => {
         this.verify();
       }, 250);
+    }
+  }
+
+  /**
+   * Trims the batchId form control value. 
+   * Call this from (blur) in your HTML template.
+   */
+  trimBatchId() {
+    const control = this.form.get('batchId');
+    if (control?.value) {
+      control.setValue(String(control.value).trim());
     }
   }
 
@@ -85,46 +87,33 @@ export class VerifyBatch implements OnInit {
     const batchId = String(this.form.getRawValue().batchId || '').trim();
     const note = String(this.form.getRawValue().note || '').trim();
 
-    if (!batchId) {
-      this.error.set('Batch ID is required');
+    if (!batchId || /e\+|e-/i.test(batchId)) {
+      this.error.set('Invalid batch ID. Please scan the QR code again or paste the full batch ID.');
       return;
     }
 
     this.loading.set(true);
 
     try {
-      // 1. send blockchain transaction from MetaMask
-      await this.pharmaWeb3.verifyAndLog(
-        Number(batchId),
-        note || 'Verified automatically from UI / QR'
-      );
+      // 1. send blockchain transaction
+      const data = await this.pharmaWeb3.verifyPublic(batchId);
+      this.result.set(data);
 
-      // 2. fetch fresh updated verification data from backend/API
+      // 2. fetch fresh updated verification data
       this.pharma.verifyBatch(batchId).subscribe({
         next: (verifyRes: any) => {
           this.result.set(verifyRes);
           this.loading.set(false);
-
-          // keep URL aligned to batch
           this.router.navigate(['/verify', batchId]);
         },
         error: (err: any) => {
-          this.error.set(
-            err?.error?.error ||
-              err?.error?.message ||
-              'Verification refresh failed'
-          );
+          this.error.set(err?.error?.error || err?.error?.message || 'Verification refresh failed');
           this.loading.set(false);
         },
       });
     } catch (err: any) {
       console.error(err);
-      this.error.set(
-        err?.shortMessage ||
-          err?.reason ||
-          err?.message ||
-          'Verify and log failed with MetaMask'
-      );
+      this.error.set(err?.shortMessage || err?.reason || err?.message || 'Verify and log failed');
       this.loading.set(false);
     }
   }
@@ -141,21 +130,18 @@ export class VerifyBatch implements OnInit {
     this.router.navigate(['/verify']);
   }
 
-  formatDate(unix?: number | string): string {
+  formatDate = (unix?: number | string) => {
     const value = Number(unix);
-    if (!value) return '—';
-    return new Date(value * 1000).toLocaleDateString();
-  }
+    return value ? new Date(value * 1000).toLocaleDateString() : '—';
+  };
 
-  shortAddress(addr?: string): string {
+  shortAddress = (addr?: string) => {
     if (!addr) return '—';
     return addr.length > 10 ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : addr;
-  }
+  };
 
   copyText(value?: string) {
     if (!value) return;
-    navigator.clipboard.writeText(value).catch((err) => {
-      console.error('Failed to copy text:', err);
-    });
+    navigator.clipboard.writeText(value).catch(err => console.error('Copy failed:', err));
   }
 }

@@ -43,7 +43,7 @@ export class TransferBatch {
 
     const raw = this.form.getRawValue();
     const payload = {
-      batchId: Number(raw.batchId),
+      batchId: String(raw.batchId),
       newOwner: String(raw.newOwner || '').trim(),
       note: String(raw.note || '').trim(),
     };

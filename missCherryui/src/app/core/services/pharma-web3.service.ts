@@ -29,19 +29,29 @@ export class PharmaWeb3Service {
 
   private readonly rpcUrl = 'http://127.0.0.1:8545';
 
-  private toBigIntSafe(value: string | number): bigint {
-    const normalized = String(value ?? '').trim();
+private toBigIntSafe(value: string | number): bigint {
+  const normalized = String(value ?? '').trim();
 
-    if (!normalized) {
-      throw new Error('Batch ID is required');
-    }
-
-    try {
-      return BigInt(normalized);
-    } catch {
-      throw new Error('Invalid batch ID format');
-    }
+  if (!normalized) {
+    throw new Error('Batch ID is required');
   }
+
+  // ðŸš¨ block scientific notation
+  if (/e\+|e-/i.test(normalized)) {
+    throw new Error('Invalid batch ID: scientific notation not allowed');
+  }
+
+  // ðŸš¨ only digits allowed
+  if (!/^\d+$/.test(normalized)) {
+    throw new Error('Batch ID must be a numeric string');
+  }
+
+  try {
+    return BigInt(normalized);
+  } catch {
+    throw new Error('Invalid batch ID format');
+  }
+}
 
   private toUintSafe(value: string | number, label: string): bigint {
     const normalized = String(value ?? '').trim();
@@ -271,7 +281,15 @@ export class PharmaWeb3Service {
 
     throw new Error('Invalid role');
   }
-
+async verifyPublic(batchId: string | number) {
+  try {
+    return await this.verifyBatchRead(batchId);
+  } catch (error: any) {
+    throw new Error(
+      error?.message || 'Failed to verify batch. Please check the ID.'
+    );
+  }
+}
   async getConnectedWalletRoleStatus() {
     const contract = await this.getWriteContract();
 
@@ -350,25 +368,29 @@ export class PharmaWeb3Service {
     }
   }
 
- async getAllBatches() {
+async getAllBatches() {
   const contract = this.getReadOnlyContract();
 
   try {
-    const events = await contract.queryFilter('BatchRegistered');
+    // safer filter
+    const filter =
+      contract.filters?.['BatchRegistered']?.() || 'BatchRegistered';
+
+    const events = await contract.queryFilter(filter);
 
     const batches = [];
 
-    for (const event of events) {
-      if (!('args' in event) || !event.args?.[0]) continue;
+    for (const event of events as any[]) {
+      const args = event?.args;
+      if (!args || !args[0]) continue;
 
-      const batchId = event.args[0].toString();
-      if (!batchId) continue;
+      const batchId = args[0].toString();
 
       try {
         const batch = await this.getBatch(batchId);
         batches.push(batch);
       } catch {
-        // skip broken entries
+        // skip broken
       }
     }
 

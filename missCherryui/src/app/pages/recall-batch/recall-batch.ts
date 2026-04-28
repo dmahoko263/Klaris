@@ -41,10 +41,10 @@ export class RecallBatch {
     }
 
     const raw = this.form.getRawValue();
-    const batchId = Number(raw.batchId);
+    const batchId = String(raw.batchId || '').trim();
     const reason = String(raw.reason || '').trim();
 
-    if (!batchId || Number.isNaN(batchId)) {
+    if (!batchId || String(batchId).length < 5) {
       this.error.set('A valid batch ID is required.');
       return;
     }
