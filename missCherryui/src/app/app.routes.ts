@@ -1,8 +1,13 @@
 import { Routes } from '@angular/router';
 import { DashboardLayout } from './layout/dashboard-layout/dashboard-layout';
 import { AuthLayout } from './layout/auth-layout/auth-layout';
+import { VerificationHistory } from './pages/verification-history/verification-history';
+import { VerifyBatch } from './pages/verify-batch/verify-batch';
 
-export const routes: Routes = [
+export const routes: Routes = [{
+    path:'verify/:batchId',
+    component:VerifyBatch
+},
   {
         path:'',
         component:DashboardLayout,

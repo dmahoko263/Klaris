@@ -144,4 +144,20 @@ export class VerifyBatch implements OnInit {
     if (!value) return;
     navigator.clipboard.writeText(value).catch(err => console.error('Copy failed:', err));
   }
+
+shortBatchId(id?: string | number | null): string {
+  if (id === undefined || id === null) {
+    return '—';
+  }
+
+  const value = String(id).trim();
+
+  if (!value) {
+    return '—';
+  }
+
+  return value.length > 5
+    ? `${value.slice(0, 5)}...`
+    : value;
+}
 }
