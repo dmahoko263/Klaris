@@ -220,16 +220,27 @@ export async function recallBatch(req, res) {
 
 export async function verifyBatch(req, res) {
   try {
-    const batchId = Number(req.params.batchId);
+    const batchId = String(req.params.batchId || req.body?.batchId || "").trim();
 
-    if (!batchId || Number.isNaN(batchId)) {
+    if (!batchId) {
+      return res.status(400).json({ ok: false, error: "Batch ID is required" });
+    }
+
+    if (/e\+|e-/i.test(batchId)) {
       return res.status(400).json({
         ok: false,
-        error: "Invalid batch ID",
+        error: "Invalid batch ID: paste or scan the full ID, not scientific notation",
       });
     }
 
-    const result = await pharma.verifyBatch(batchId);
+    if (!/^\d+$/.test(batchId)) {
+      return res.status(400).json({
+        ok: false,
+        error: "Invalid batch ID: must contain digits only",
+      });
+    }
+
+    const result = await pharma.verifyBatch(BigInt(batchId));
 
     const [
       valid,
@@ -247,23 +258,24 @@ export async function verifyBatch(req, res) {
 
     return res.json({
       ok: true,
+      batchId,
       valid,
       reason,
       drugName,
       manufacturerName,
-      manufactureDate: toStr(manufactureDate),
-      expiryDate: toStr(expiryDate),
+      manufactureDate: manufactureDate.toString(),
+      expiryDate: expiryDate.toString(),
       manufacturer,
       currentOwner,
-      status: toNum(status),
-      suspicious: Boolean(suspicious),
-      verificationCount: toStr(verificationCount),
+      status: Number(status),
+      suspicious,
+      verificationCount: verificationCount.toString(),
     });
   } catch (error) {
     console.error("VERIFY_BATCH_ERROR:", error);
     return res.status(500).json({
       ok: false,
-      error: error.message || "Failed to verify batch",
+      error: error?.shortMessage || error?.message || "Failed to verify batch",
     });
   }
 }
@@ -324,33 +336,45 @@ export async function fetchBatch(req, res) {
 
 export async function fetchVerificationHistory(req, res) {
   try {
-    const batchId = Number(req.params.batchId);
+    const batchId = String(req.params.batchId || "").trim();
 
-    if (!batchId || Number.isNaN(batchId)) {
+    if (!batchId) {
+      return res.status(400).json({ ok: false, error: "Batch ID is required" });
+    }
+
+    if (/e\+|e-/i.test(batchId)) {
       return res.status(400).json({
         ok: false,
-        error: "Invalid batch ID",
+        error: "Invalid batch ID: scientific notation not allowed. Use the full batch ID.",
       });
     }
 
-    const result = await pharma.getVerificationHistory(batchId);
+    if (!/^\d+$/.test(batchId)) {
+      return res.status(400).json({
+        ok: false,
+        error: "Invalid batch ID: digits only.",
+      });
+    }
+
+    const result = await pharma.getVerificationHistory(BigInt(batchId));
 
     const history = result.map((item) => ({
       verifier: item.verifier,
-      timestamp: toStr(item.timestamp),
+      timestamp: item.timestamp.toString(),
       validAtScan: Boolean(item.validAtScan),
-      note: toStr(item.note),
+      note: item.note || "",
     }));
 
-    return res.json({
-      ok: true,
-      history,
-    });
+    return res.json({ ok: true, history });
   } catch (error) {
     console.error("FETCH_VERIFICATION_HISTORY_ERROR:", error);
     return res.status(500).json({
       ok: false,
-      error: error.message || "Failed to fetch verification history",
+      error:
+        error?.shortMessage ||
+        error?.reason ||
+        error?.message ||
+        "Failed to fetch verification history",
     });
   }
 }
