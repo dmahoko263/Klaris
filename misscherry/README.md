@@ -11,3 +11,4 @@ npx hardhat node
 npx hardhat build
 ## Deploy contract
 npx hardhat ignition deploy ignition/modules/pharma.ts --network localhost
+keep
