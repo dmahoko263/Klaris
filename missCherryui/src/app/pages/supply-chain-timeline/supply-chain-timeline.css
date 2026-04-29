@@ -1,3 +1,27 @@
 :host {
   display: block;
 }
+@media print {
+  body {
+    background: white !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+
+  .card {
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .timeline-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  @page {
+    size: A4;
+    margin: 14mm;
+  }
+}

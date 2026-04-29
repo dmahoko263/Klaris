@@ -114,9 +114,18 @@ export class PharmaService {
     return this.http.get<BatchCountResponse>(`${this.baseUrl}/batches/count`);
   }
 
-  verifyBatch(batchId: number | string): Observable<ApiResponse> {
-    return this.http.get<ApiResponse>(`${this.baseUrl}/batches/${batchId}/verify`);
-  }
+verifyBatch(batchId: number | string): Observable<ApiResponse> {
+  const id = String(batchId).trim();
+
+  return this.http.post<ApiResponse>(
+    `${environment.apiUrl}/verifications`,
+    {
+      batchId: id,
+      method: 'QR',
+      inputValue: id,
+    }
+  );
+}
 
   verifyAndLog(batchId: number | string, note?: string): Observable<ApiResponse> {
     return this.http.post<ApiResponse>(`${this.baseUrl}/batches/${batchId}/verify-log`, {

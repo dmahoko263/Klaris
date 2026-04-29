@@ -248,4 +248,7 @@ export class SupplyChainTimeline {
     if (type === 'flagged') return 'bg-crimson-500';
     return 'bg-silver-500';
   }
+  printTimeline() {
+  window.print();
+}
 }

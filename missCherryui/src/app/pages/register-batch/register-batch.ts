@@ -223,11 +223,11 @@ export class RegisterBatch {
 
             this.error.set(
               err?.reason ||
-                err?.shortMessage ||
-                err?.info?.error?.message ||
-                err?.data?.message ||
-                err?.message ||
-                'Failed to register batch with MetaMask'
+              err?.shortMessage ||
+              err?.info?.error?.message ||
+              err?.data?.message ||
+              err?.message ||
+              'Failed to register batch with MetaMask'
             );
 
             this.loading.set(false);
@@ -238,9 +238,9 @@ export class RegisterBatch {
 
         this.error.set(
           err?.error?.error ||
-            err?.error?.message ||
-            err?.message ||
-            'Failed to upload metadata'
+          err?.error?.message ||
+          err?.message ||
+          'Failed to upload metadata'
         );
 
         this.loading.set(false);
@@ -249,40 +249,96 @@ export class RegisterBatch {
   }
 
   printLabel() {
-    window.print();
+    const printContents = document.getElementById('print-label')?.innerHTML;
+
+    if (!printContents) {
+      console.error('Print label section not found');
+      return;
+    }
+
+    const popup = window.open('', '_blank', 'width=900,height=700');
+
+    if (!popup) {
+      console.error('Unable to open print window');
+      return;
+    }
+
+    popup.document.open();
+    popup.document.write(`
+    <html>
+      <head>
+        <title>Print Package Label</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            color: #000;
+          }
+
+          .print-area {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+          }
+
+          img {
+            max-width: 100%;
+          }
+
+          @page {
+            size: A4;
+            margin: 12mm;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="print-area">
+          ${printContents}
+        </div>
+      </body>
+    </html>
+  `);
+
+    popup.document.close();
+    popup.focus();
+
+    setTimeout(() => {
+      popup.print();
+      popup.close();
+    }, 500);
   }
-shortBatchId(id?: string | number | null): string {
-  if (id === undefined || id === null) {
-    return '—';
+  shortBatchId(id?: string | number | null): string {
+    if (id === undefined || id === null) {
+      return '—';
+    }
+
+    const value = String(id).trim();
+
+    if (!value) {
+      return '—';
+    }
+
+    return value.length > 5
+      ? `${value.slice(0, 5)}...`
+      : value;
   }
 
-  const value = String(id).trim();
+  copyBatchId(id?: string | number | null): void {
+    if (id === undefined || id === null) return;
 
-  if (!value) {
-    return '—';
+    const value = String(id).trim();
+
+    if (!value) return;
+
+    navigator.clipboard.writeText(value)
+      .then(() => {
+        this.successMessage.set('Batch ID copied');
+        console.log('Batch ID copied:', value);
+      })
+      .catch((error) => {
+        console.error('Failed to copy Batch ID:', error);
+        this.error.set('Failed to copy Batch ID');
+      });
   }
-
-  return value.length > 5
-    ? `${value.slice(0, 5)}...`
-    : value;
-}
-
-copyBatchId(id?: string | number | null): void {
-  if (id === undefined || id === null) return;
-
-  const value = String(id).trim();
-
-  if (!value) return;
-
-  navigator.clipboard.writeText(value)
-    .then(() => {
-      this.successMessage.set('Batch ID copied');
-      console.log('Batch ID copied:', value);
-    })
-    .catch((error) => {
-      console.error('Failed to copy Batch ID:', error);
-      this.error.set('Failed to copy Batch ID');
-    });
-}
 
 }

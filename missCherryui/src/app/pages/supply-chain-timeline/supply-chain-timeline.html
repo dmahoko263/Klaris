@@ -12,7 +12,7 @@
         <label class="label">Batch ID</label>
         <input
           class="input"
-          type="number"
+          type="text"
           formControlName="batchId"
           placeholder="Enter batch ID"
         />
@@ -36,6 +36,13 @@
         >
           Reset
         </button>
+        <button
+  type="button"
+  class="btn btn-primary print:hidden"
+  (click)="printTimeline()"
+>
+  Print / Save PDF
+</button>
       </div>
     </form>
 

@@ -117,45 +117,59 @@ successMessage=signal('');
     }
   }
 
-  private loadBatches(showLoader = true) {
-    if (showLoader || this.batches().length === 0) {
-      this.loadingBatches.set(true);
-    }
-
-    this.batchesError.set('');
-
-    this.pharma.getAllBatches().subscribe({
-      next: (data: BatchRecord[]) => {
-        const mapped: Batch[] = data.map((item) => ({
-          batchId: item.batchId,
-          drugName: item.drugName,
-          manufacturerName: item.manufacturerName,
-          manufactureDate: Number(item.manufactureDate ?? 0),
-          expiryDate: Number(item.expiryDate ?? 0),
-          metadataURI: item.metadataURI ?? '',
-          manufacturer: item.manufacturerName ?? '',
-          currentOwner: item.currentOwner ?? '',
-          status: this.mapStatus(item.status),
-          exists: true,
-          suspicious: Boolean(item.isSuspicious ?? false),
-          verificationCount: Number(item.verificationCount ?? 0),
-          uniqueVerifierCount: Number(item.uniqueVerifierCount ?? 0),
-          createdAt: Number(item.createdAt ?? item.manufactureDate ?? 0),
-        }));
-
-        this.batches.set(mapped);
-        this.loadingBatches.set(false);
-      },
-      error: (err: any) => {
-        this.batchesError.set(
-          err?.error?.error ||
-            err?.error?.message ||
-            'Failed to load blockchain data'
-        );
-        this.loadingBatches.set(false);
-      },
-    });
+private loadBatches(showLoader = true) {
+  if (showLoader || this.batches().length === 0) {
+    this.loadingBatches.set(true);
   }
+
+  this.batchesError.set('');
+
+  this.pharma.getAllBatches().subscribe({
+    next: (res: any) => {
+      const data: BatchRecord[] = Array.isArray(res)
+        ? res
+        : res?.batches || [];
+
+      const mapped: Batch[] = data.map((item) => ({
+        batchId: String(item.batchId || ''),
+        drugName: item.drugName,
+        manufacturerName: item.manufacturerName,
+        manufactureDate: Number(item.manufactureDate ?? 0),
+        expiryDate: Number(item.expiryDate ?? 0),
+        metadataURI: item.metadataURI ?? '',
+        manufacturer: item.manufacturerName ?? '',
+        currentOwner: item.currentOwner ?? '',
+        status: this.mapStatus(item.status),
+       exists: true,
+       suspicious: Boolean(
+  item.isSuspicious ??
+  (item as any).suspicious ??
+  false
+),
+        verificationCount: Number(item.verificationCount ?? 0),
+        uniqueVerifierCount: Number(item.uniqueVerifierCount ?? 0),
+        createdAt: Number(
+          item.createdAt ?? item.manufactureDate ?? 0
+        ),
+      }));
+
+      this.batches.set(mapped);
+      this.loadingBatches.set(false);
+    },
+
+    error: (err: any) => {
+      console.error(err);
+
+      this.batchesError.set(
+        err?.error?.error ||
+        err?.error?.message ||
+        'Failed to load blockchain data'
+      );
+
+      this.loadingBatches.set(false);
+    },
+  });
+}
 
   refresh() {
     this.loadBatches(true);

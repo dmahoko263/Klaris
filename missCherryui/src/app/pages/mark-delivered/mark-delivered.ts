@@ -39,9 +39,9 @@ export class MarkDelivered {
       return;
     }
 
-    const batchId = Number(this.form.getRawValue().batchId);
+    const batchId = String(this.form.getRawValue().batchId).trim();
 
-    if (!batchId || Number.isNaN(batchId)) {
+    if (!batchId || batchId.length === 0) {
       this.error.set('A valid batch ID is required.');
       return;
     }

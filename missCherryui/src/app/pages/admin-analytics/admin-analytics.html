@@ -1,5 +1,5 @@
-<div class="card max-w-7xl mx-auto">
-  <div class="card-body p-6 md:p-8">
+<div class="card w-full max-w-7xl mx-auto">
+  <div class="card-body p-4 md:p-5">
     <div class="mb-6 flex items-center justify-between gap-4 border-b border-border pb-4">
       <div>
         <h1 class="text-2xl font-extrabold text-foreground">Admin Analytics Dashboard</h1>
@@ -150,10 +150,7 @@
                       {{ batch.drugName }}
                     </div>
                     <div class="text-sm text-muted">
-                      Batch #{{ batch.batchId }} • {{ batch.manufacturerName }}
-                    </div>
-                    <div class="mt-1 text-xs text-muted">
-                      Expiry: {{ formatDate(batch.expiryDate) }}
+                      Batch # {{ shortBatchId(batch.batchId) }} • {{ batch.manufacturerName }}
                     </div>
                     <div class="mt-1 text-xs text-muted">
                       Verifications: {{ batch.verificationCount }}

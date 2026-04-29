@@ -58,18 +58,40 @@ export class SideBar {
       roles: ['admin', 'manufacturer', 'distributor', 'pharmacy'],
     },
     {
+      label: 'Admin Analytics',
+      icon: LayoutDashboard,
+      to: '/dashboard/admin-analytics',
+      roles: ['admin'],
+    },
+    {
       label:'Network Activity',
       icon:Network,
       to:'/dashboard/network-activity',
       roles:['admin'],
-    }
-    ,
+    },    {
+      label: 'Supply Chain Timeline',
+      icon: Clock,
+      to: '/dashboard/supply-chain-timeline',
+      roles: ['admin','manufacturer','distributor','pharmacy','patient'],
+    },
+    
     {
-      label: 'Batches',
+      label: 'Register Batch',
       icon: LucideSquareStack,
       to: '/dashboard/batches',
       roles: ['manufacturer'],
+    }, {
+      label: 'Transfer Batch',
+      icon: Send,
+      to: '/dashboard/transfer-batch',
+      roles: ['patient', 'distributor', 'pharmacy', 'manufacturer', 'admin'], // added this new item
     },
+{
+  label: 'Mark Delivered',
+  icon: LocateIcon,
+  to: '/dashboard/mark-delivered',
+  roles: [ 'distributor', 'pharmacy'], // added this new item
+},
     // {
     //   label: 'History',
     //   icon: History,
@@ -86,36 +108,26 @@ export class SideBar {
       label: 'Verify Batch',
       icon: Check,
       to: '/dashboard/verify-batch',
-      roles: ['patient', 'distributor', 'pharmacy', 'manufacturer'], // changed here
+      roles: ['patient', 'distributor', 'pharmacy', 'manufacturer'], 
     },{
   label: 'Scan QR',
   icon: ScanBarcode,
   to: '/dashboard/scan-batch',
   roles: ['patient'], // added this new item
-},
-{
-  label: 'Mark Delivered',
-  icon: LocateIcon,
-  to: '/dashboard/mark-delivered',
-  roles: [ 'distributor', 'pharmacy'], // added this new item
 },{
       label: 'Ownership History',
       icon: AlignHorizontalDistributeEndIcon,
       to: '/dashboard/ownership-history',
-      roles: ['patient', 'distributor', 'pharmacy', 'manufacturer', 'admin'], // added this new item
+      roles: ['patient', 'distributor', 'pharmacy', 'manufacturer', 'admin'], 
 },
-    {
-      label: 'Transfer Batch',
-      icon: Send,
-      to: '/dashboard/transfer-batch',
-      roles: ['patient', 'distributor', 'pharmacy', 'manufacturer', 'admin'], // added this new item
-    },
+   
     {
       label: 'Recall Batch',
-      icon: CircleArrowOutUpLeftIcon, // Replace with actual icon
+      icon: CircleArrowOutUpLeftIcon, 
       to: '/dashboard/recall-batch',
-      roles: ['admin','manufacturer'], // added this new item
+      roles: ['admin','manufacturer'], 
     },
+
     {
       label: 'Verification History',
       icon: History,
@@ -126,20 +138,10 @@ export class SideBar {
       label: 'Grant Role',
       icon: User,
       to: '/dashboard/grant-role',
-      roles: ['admin'], // added this new item
+      roles: ['admin'], 
     },
-    {
-      label: 'Admin Analytics',
-      icon: LayoutDashboard,
-      to: '/dashboard/admin-analytics',
-      roles: ['admin'],
-    },
-    {
-      label: 'Supply Chain Timeline',
-      icon: Clock,
-      to: '/dashboard/supply-chain-timeline',
-      roles: ['admin'],
-    },
+    
+
     {
       label: 'Users',
       icon: User,

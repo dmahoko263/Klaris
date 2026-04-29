@@ -176,30 +176,33 @@ export class AdminAnalytics implements OnInit, OnDestroy {
         finish();
       },
     });
+this.pharma.getAllBatches().subscribe({
+  next: (res: any) => {
+    const data: BatchRecord[] = Array.isArray(res)
+      ? res
+      : res?.batches || [];
 
-    this.pharma.getAllBatches().subscribe({
-      next: (data: BatchRecord[]) => {
-        const mapped: DashboardBatch[] = data.map((item) => ({
-          batchId: item.batchId,
-          drugName: item.drugName,
-          manufacturerName: item.manufacturerName,
-          manufactureDate: Number(item.manufactureDate ?? 0),
-          expiryDate: Number(item.expiryDate ?? 0),
-          metadataURI: item.metadataURI ?? '',
-          manufacturer: item.manufacturerName ?? '',
-          currentOwner: item.currentOwner ?? '',
-          status: this.mapStatus(item.status),
-          exists: true,
-          suspicious: Boolean(item.isSuspicious ?? false),
-          verificationCount: Number(item.verificationCount ?? 0),
-          uniqueVerifierCount: Number(item.uniqueVerifierCount ?? 0),
-          createdAt: Number(item.createdAt ?? item.manufactureDate ?? 0),
-        }));
+    const mapped: DashboardBatch[] = data.map((item: any) => ({
+      batchId: String(item.batchId || ''),
+      drugName: item.drugName,
+      manufacturerName: item.manufacturerName,
+      manufactureDate: Number(item.manufactureDate ?? 0),
+      expiryDate: Number(item.expiryDate ?? 0),
+      metadataURI: item.metadataURI ?? '',
+      manufacturer: item.manufacturer ?? item.manufacturerName ?? '',
+      currentOwner: item.currentOwner ?? '',
+      status: this.mapStatus(item.status),
+      exists: Boolean(item.exists ?? true),
+      suspicious: Boolean(item.isSuspicious ?? item.suspicious ?? false),
+      verificationCount: Number(item.verificationCount ?? 0),
+      uniqueVerifierCount: Number(item.uniqueVerifierCount ?? 0),
+      createdAt: Number(item.createdAt ?? item.manufactureDate ?? 0),
+    }));
 
-        this.batches.set(mapped);
-        batchesDone = true;
-        finish();
-      },
+    this.batches.set(mapped);
+    batchesDone = true;
+    finish();
+  },
       error: (err: any) => {
         failed = true;
         this.error.set(
@@ -285,4 +288,20 @@ export class AdminAnalytics implements OnInit, OnDestroy {
         return 'Unknown';
     }
   }
+  shortBatchId(id?: string | number | null): string {
+  if (id === undefined || id === null) {
+    return '—';
+  }
+
+  const value = String(id).trim();
+
+  if (!value) {
+    return '—';
+  }
+
+  return value.length > 5
+    ? `${value.slice(0, 5)}...`
+    : value;
+}
+
 }
