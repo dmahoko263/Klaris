@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-
+import verificationsRoutes from "./routes/verifications.routes.js";
 import pharmaRoutes from "./routes/pharma.routes.js";
 import walletRoleRoutes from "./routes/walletRole.routes.js";
 import auth from "./routes/auth.routes.js";
@@ -31,6 +31,7 @@ app.get("/health", (req, res) => {
 
 // Routes
 app.use("/api/pharma", pharmaRoutes);
+app.use("/api/verifications", verificationsRoutes);
 app.use("/api/ipfs", ipfsRoutes); // ✅ ADD THIS (IMPORTANT)]
 app.use("/api/network-activity", networkActivityRoutes);
 app.use("/api/wallet-roles", walletRoleRoutes);

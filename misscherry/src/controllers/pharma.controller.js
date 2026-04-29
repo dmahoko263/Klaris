@@ -313,22 +313,41 @@ export async function verifyAndLog(req, res) {
 
 export async function fetchBatch(req, res) {
   try {
-    const batchId = Number(req.params.batchId);
+    const batchId = String(req.params.batchId || "").trim();
 
-    if (!batchId || Number.isNaN(batchId)) {
-      return res.status(400).json({
-        ok: false,
-        error: "Invalid batch ID",
-      });
+    if (!batchId) {
+      return res.status(400).json({ ok: false, error: "Batch ID is required" });
     }
 
-    const result = await pharma.getBatch(batchId);
-    return res.json(mapBatchTuple(result));
+    if (/e\+|e-/i.test(batchId) || !/^\d+$/.test(batchId)) {
+      return res.status(400).json({ ok: false, error: "Invalid batch ID" });
+    }
+
+    const batch = await pharma.getBatch(BigInt(batchId));
+
+    res.json({
+      ok: true,
+      batch: {
+        batchId: batch.batchId.toString(),
+        drugName: batch.drugName,
+        manufacturerName: batch.manufacturerName,
+        manufactureDate: batch.manufactureDate.toString(),
+        expiryDate: batch.expiryDate.toString(),
+        metadataURI: batch.metadataURI,
+        manufacturer: batch.manufacturer,
+        currentOwner: batch.currentOwner,
+        status: Number(batch.status),
+        exists: Boolean(batch.exists),
+        suspicious: Boolean(batch.suspicious),
+        verificationCount: batch.verificationCount.toString(),
+        uniqueVerifierCount: batch.uniqueVerifierCount.toString(),
+        createdAt: batch.createdAt.toString(),
+      },
+    });
   } catch (error) {
-    console.error("FETCH_BATCH_ERROR:", error);
-    return res.status(500).json({
+    res.status(500).json({
       ok: false,
-      error: error.message || "Failed to fetch batch",
+      error: error?.shortMessage || error?.message || "Failed to fetch batch",
     });
   }
 }

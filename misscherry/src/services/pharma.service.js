@@ -104,6 +104,17 @@ async function logRevert(functionName, method, payload = null, error = null) {
 }
 
 async function logCall(functionName, payload = null, status = "SUCCESS", reason = null) {
+  const noisySuccessCalls = [
+    "getBatch",
+    "queryFilter(BatchRegistered)",
+    "batchCount",
+    "getBatchCount",
+  ];
+
+  if (status === "SUCCESS" && noisySuccessCalls.includes(functionName)) {
+    return;
+  }
+
   await logNetworkActivity({
     type: "CALL",
     method: "eth_call",

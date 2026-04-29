@@ -1,10 +1,30 @@
 import { Router } from "express";
 import { verifyBatch } from "../controllers/verifications.controller.js";
-import { authRequired } from "../middleware/auth.middleware.js";
 
 const router = Router();
 
-// optional auth — keep open if you want public verification
+/*
+========================================
+PUBLIC VERIFICATION ROUTES
+Anyone can verify a medicine batch
+No login required
+========================================
+*/
+
+// verify using QR / batch ID
 router.post("/", verifyBatch);
+
+// verify directly using route param
+router.get("/:batchId", (req, res, next) => {
+  req.body = {
+    ...req.body,
+    batchId: req.params.batchId,
+    method: "QR",
+    inputValue: req.params.batchId,
+  };
+
+  next();
+}, verifyBatch);
+
 
 export default router;

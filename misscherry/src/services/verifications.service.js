@@ -1,52 +1,54 @@
 import { Verification } from "../models/index.js";
-import { verifyBatchOnChain } from "./pharma.service.js";
+import { getBatch } from "./pharma.service.js";
 import "dotenv/config";
 
 const chainId = Number(process.env.CHAIN_ID || 31337);
-const contractAddress = process.env.CONTRACT_ADDRESS || null;
+const contractAddress =
+  process.env.CONTRACT_ADDRESS ||
+  "0x5FbDB2315678afecb367f032d93F642f64180aa3";
 
 export async function verifyAndLog({
   batchId,
-  method = "ID",
+  method = "QR",
   inputValue,
   actorUserId = null,
   actorWallet = null,
+  ipAddress = null,
+  userAgent = null,
 }) {
-  const normalizedBatchId = String(batchId || "").trim();
+  const safeBatchId = String(batchId || "").trim();
 
-  if (!normalizedBatchId) {
+  if (!safeBatchId) {
     throw new Error("Batch ID is required");
   }
 
-  let safeBatchId;
-  try {
-    safeBatchId = BigInt(normalizedBatchId).toString();
-  } catch {
+  if (/e\+|e-/i.test(safeBatchId) || !/^\d+$/.test(safeBatchId)) {
     throw new Error("Invalid batch ID format");
   }
 
-  let data;
-  try {
-    data = await verifyBatchOnChain(safeBatchId);
-  } catch (error) {
-    throw new Error(
-      error?.reason ||
-        error?.shortMessage ||
-        error?.message ||
-        "Failed to verify batch on chain"
-    );
-  }
+  const verifierKey =
+    actorWallet ||
+    `${ipAddress || "unknown-ip"}|${userAgent || "unknown-device"}`;
+
+  console.log("VERIFY_AND_LOG_INPUT:", {
+    batchId: safeBatchId,
+    method,
+    verifierKey,
+  });
+
+  const data = await getBatch(safeBatchId);
 
   const exists = !!data?.exists;
-  const suspicious = !!data?.suspicious;
+  const contractSuspicious = !!data?.suspicious;
   const status = Number(data?.status ?? 0);
+
   const expired =
     !!data?.expiryDate && Number(data.expiryDate) > 0
       ? Math.floor(Date.now() / 1000) > Number(data.expiryDate)
       : false;
 
   let resultValid = false;
-  let resultReason = "NOT_FOUND";
+  let resultReason = "BATCH_NOT_FOUND";
 
   if (!exists) {
     resultValid = false;
@@ -57,7 +59,7 @@ export async function verifyAndLog({
   } else if (expired) {
     resultValid = false;
     resultReason = "BATCH_EXPIRED";
-  } else if (suspicious) {
+  } else if (contractSuspicious) {
     resultValid = true;
     resultReason = "FOUND_SUSPICIOUS";
   } else {
@@ -65,22 +67,63 @@ export async function verifyAndLog({
     resultReason = "AUTHENTIC";
   }
 
-  await Verification.create({
+  const created = await Verification.create({
     chainId,
     contractAddress,
     batchId: safeBatchId,
     method,
-    inputValue: inputValue || normalizedBatchId,
+    inputValue: verifierKey,
     resultValid,
     resultReason,
     scannedByUserId: actorUserId,
     scannedByWallet: actorWallet,
   });
 
+  console.log("VERIFICATION_CREATED:", created.id);
+
+  const verificationCount = await Verification.count({
+    where: { batchId: safeBatchId },
+  });
+
+  const uniqueVerifierCount = await Verification.count({
+    where: { batchId: safeBatchId },
+    distinct: true,
+    col: "inputValue",
+  });
+
+  let suspicious = contractSuspicious;
+  let suspiciousReason = contractSuspicious
+    ? "Batch has been flagged suspicious on-chain"
+    : null;
+
+  if (uniqueVerifierCount > 0 && status !== 2 && status !== 3) {
+    suspicious = true;
+    suspiciousReason = "Too many unique verifiers before delivery";
+  }
+
+  if (expired) {
+    suspicious = true;
+    suspiciousReason = "Expired batch scanned";
+  }
+
+ if (status === 3) {
+  suspicious = true;
+  suspiciousReason = "Recalled batch scanned";
+  resultValid = false;
+  resultReason = "BATCH_RECALLED";
+}
+
+  const finalReason =
+    suspicious && resultValid ? "FOUND_SUSPICIOUS" : resultReason;
+
   return {
     ...data,
     batchId: safeBatchId,
     valid: resultValid,
-    reason: resultReason,
+    reason: finalReason,
+    suspicious,
+    suspiciousReason,
+    verificationCount,
+    uniqueVerifierCount,
   };
 }
